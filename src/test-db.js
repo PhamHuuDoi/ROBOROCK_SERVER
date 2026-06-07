@@ -1,5 +1,4 @@
-import prisma from "./config/prisma.js";
-
+const prisma = require('./config/prisma');
 async function test() {
   const roles = await prisma.role.findMany();
 

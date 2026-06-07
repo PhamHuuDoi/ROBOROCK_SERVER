@@ -1,7 +1,8 @@
-import app from "./app.js";
+const app = require('./app');
+const env = require('./config/env');
 
-const PORT = process.env.PORT || 5000;
-
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+const port = env.PORT || 3000;
+app.listen(port, () => {
+  // eslint-disable-next-line no-console
+  console.log(`Server running on port ${port}`);
 });

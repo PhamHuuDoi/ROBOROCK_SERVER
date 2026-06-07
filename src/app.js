@@ -1,9 +1,16 @@
-import express from "express";
-import cors from "cors";
+const express = require('express');
+const routes = require('./routes');
+const env = require('./config/env');
 
 const app = express();
-
-app.use(cors());
 app.use(express.json());
 
-export default app;
+app.use('/api', routes);
+
+// basic error handler
+app.use((err, req, res, next) => {
+  const status = err.status || 500;
+  res.status(status).json({ error: err.message || 'Internal server error' });
+});
+
+module.exports = app;
