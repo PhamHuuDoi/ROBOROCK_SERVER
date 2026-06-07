@@ -3,6 +3,10 @@ const jwt = require("jsonwebtoken");
 const repo = require("../repository/auth.repository");
 const jwtConfig = require("../../../config/jwt");
 const env = require("../../../config/env");
+const {
+  generateAccessToken,
+  generateRefreshToken,
+} = require("../../../config/jwt");
 
 async function register({ fullName, email, password }) {
   const existingUser = await repo.findUserByEmail(email);
@@ -41,32 +45,63 @@ async function register({ fullName, email, password }) {
     role: customerRole.name,
   };
 }
-async function login({ email, password }) {
-  const user = await repo.findUserByEmail(email);
-  if (!user) {
-    throw { status: 401, message: "Invalid credentials" };
-  }
-  const ok = await bcrypt.compare(password, user.password);
-  if (!ok) {
-    throw { status: 401, message: "Invalid credentials" };
-  }
-  const accessToken = jwt.sign(
-    { sub: user.id, role: user.role?.name },
-    jwtConfig.SECRET,
-    { expiresIn: jwtConfig.ACCESS_EXPIRES },
-  );
-  const refreshToken = jwt.sign({ sub: user.id }, jwtConfig.SECRET, {
-    expiresIn: jwtConfig.REFRESH_EXPIRES,
-  });
+function generateTokens(user) {
+  const accessToken =
+    generateAccessToken({
+      sub: user.id,
+      role: user.role.name,
+    });
+
+  const refreshToken =
+    generateRefreshToken({
+      sub: user.id,
+    });
 
   return {
     accessToken,
     refreshToken,
+  };
+}
+
+async function login({ email, password }) {
+
+  const user =
+    await repo.findUserByEmail(email);
+
+  if (!user) {
+    throw {
+      status: 401,
+      message: "Invalid credentials",
+    };
+  }
+
+  const ok =
+    await bcrypt.compare(
+      password,
+      user.password,
+    );
+
+  if (!ok) {
+    throw {
+      status: 401,
+      message: "Invalid credentials",
+    };
+  }
+
+  const {
+    accessToken,
+    refreshToken,
+  } = generateTokens(user);
+
+  return {
+    accessToken,
+    refreshToken,
+
     user: {
       id: user.id,
       fullName: user.fullName,
       email: user.email,
-      role: user.role?.name,
+      role: user.role.name,
     },
   };
 }

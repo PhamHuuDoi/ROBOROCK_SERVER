@@ -8,4 +8,22 @@ async function register(req, res, next) {
     next(err);
   }
 }
-module.exports = { register };
+async function login(
+  req,
+  res,
+  next,
+) {
+  try {
+
+    const result =
+      await service.login(
+        req.body,
+      );
+
+    return res.json(result);
+
+  } catch (err) {
+    next(err);
+  }
+}
+module.exports = { register, login };
