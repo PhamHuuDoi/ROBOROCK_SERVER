@@ -1,0 +1,652 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Role {
+  id    Int    @id @default(autoincrement())
+  name  String @unique @db.VarChar(50)
+  users User[]
+  @@map("roles")
+}
+
+model Branch {
+  id           Int           @id @default(autoincrement())
+  name         String        @db.VarChar(100)
+  address      String        @db.VarChar(255)
+  phone        String?       @db.VarChar(20)
+  email        String?       @db.VarChar(100)
+  managerId    Int?          @map("manager_id")
+  status       BranchStatus  @default(ACTIVE)
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+  branchStaffs BranchStaff[]
+  manager      User?         @relation("BranchManager", fields: [managerId], references: [id])
+  orders       Order[]
+  posOrders    PosOrder[]
+  shifts       Shift[]
+  warehouses   Warehouse[]
+
+  @@map("branches")
+}
+
+model User {
+  id                    Int                    @id @default(autoincrement())
+  roleId                Int                    @map("role_id")
+  fullName              String                 @map("full_name") @db.VarChar(100)
+  email                 String                 @unique @db.VarChar(100)
+  password              String                 @db.VarChar(255)
+  status                UserStatus             @default(ACTIVE)
+  createdAt             DateTime               @default(now()) @map("created_at")
+  updatedAt             DateTime               @updatedAt @map("updated_at")
+  auditLogs             AuditLog[]
+  branchStaffs          BranchStaff[]
+  managedBranches       Branch[]               @relation("BranchManager")
+  carts                 Cart[]
+  faultyReported        FaultyProduct[]        @relation("FaultyReportedBy")
+  faultyResolved        FaultyProduct[]        @relation("FaultyResolvedBy")
+  importReceipts        ImportReceipt[]
+  inventoryTransactions InventoryTransaction[]
+  notifications         Notification[]
+  orderStatusChanges    OrderStatusHistory[]
+  assignedOrders        Order[]                @relation("OrderAssignedStaff")
+  orders                Order[]                @relation("OrderCustomer")
+  posOrders             PosOrder[]
+  profiles              Profile[]
+  shiftStaffs           ShiftStaff[]
+  closedShifts          Shift[]                @relation("ShiftClosedBy")
+  openedShifts          Shift[]                @relation("ShiftOpenedBy")
+  stocktakingsConfirmed Stocktaking[]          @relation("StocktakingConfirmedBy")
+  stocktakingsCreated   Stocktaking[]          @relation("StocktakingCreatedBy")
+  transfersApproved     TransferRequest[]      @relation("TransferApprovedBy")
+  transfersReceived     TransferRequest[]      @relation("TransferReceivedBy")
+  transfersRequested    TransferRequest[]      @relation("TransferRequestedBy")
+  role                  Role                   @relation(fields: [roleId], references: [id])
+
+  @@map("users")
+}
+
+model Profile {
+  id        Int     @id @default(autoincrement())
+  userId    Int     @map("user_id")
+  phone     String? @db.VarChar(20)
+  address   String? @db.VarChar(255)
+  isDefault Boolean @default(false) @map("is_default")
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("profiles")
+}
+
+model Category {
+  id        Int        @id @default(autoincrement())
+  name      String     @db.VarChar(100)
+  slug      String     @unique @db.VarChar(120)
+  parentId  Int?       @map("parent_id")
+  createdAt DateTime   @default(now()) @map("created_at")
+  parent    Category?  @relation("CategoryChildren", fields: [parentId], references: [id])
+  children  Category[] @relation("CategoryChildren")
+  products  Product[]
+
+  @@map("categories")
+}
+
+model Product {
+  id                    Int                    @id @default(autoincrement())
+  categoryId            Int                    @map("category_id")
+  name                  String                 @db.VarChar(200)
+  slug                  String                 @unique @db.VarChar(220)
+  sku                   String                 @unique @db.VarChar(50)
+  description           String?
+  priceOnline           Decimal                @default(0) @map("price_online") @db.Decimal(15, 2)
+  pricePos              Decimal                @default(0) @map("price_pos") @db.Decimal(15, 2)
+  weight                Decimal?               @db.Decimal(8, 2)
+  warrantyMonths        Int?                   @map("warranty_months")
+  thumbnail             String?                @db.VarChar(500)
+  status                ProductStatus          @default(ACTIVE)
+  createdAt             DateTime               @default(now()) @map("created_at")
+  updatedAt             DateTime               @updatedAt @map("updated_at")
+  cartItems             CartItem[]
+  faultyProducts        FaultyProduct[]
+  importReceiptItems    ImportReceiptItem[]
+  inventories           Inventory[]
+  inventoryTransactions InventoryTransaction[]
+  orderItems            OrderItem[]
+  posOrderItems         PosOrderItem[]
+  images                ProductImage[]
+  category              Category               @relation(fields: [categoryId], references: [id])
+  stocktakingItems      StocktakingItem[]
+  transferRequestItems  TransferRequestItem[]
+
+  @@index([status], map: "idx_products_status")
+  @@index([categoryId], map: "idx_products_category")
+  @@map("products")
+}
+
+model ProductImage {
+  id        Int     @id @default(autoincrement())
+  productId Int     @map("product_id")
+  imageUrl  String  @map("image_url") @db.VarChar(500)
+  sortOrder Int     @default(0) @map("sort_order")
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId], map: "idx_product_images_product")
+  @@map("product_images")
+}
+
+model Supplier {
+  id             Int             @id @default(autoincrement())
+  name           String          @db.VarChar(150)
+  contactName    String?         @map("contact_name") @db.VarChar(100)
+  phone          String?         @db.VarChar(20)
+  email          String?         @db.VarChar(100)
+  address        String?         @db.VarChar(255)
+  status         SupplierStatus  @default(ACTIVE)
+  createdAt      DateTime        @default(now()) @map("created_at")
+  importReceipts ImportReceipt[]
+
+  @@map("suppliers")
+}
+
+model Warehouse {
+  id                    Int                    @id @default(autoincrement())
+  name                  String                 @db.VarChar(100)
+  branchId              Int?                   @map("branch_id")
+  type                  WarehouseType          @default(BRANCH)
+  faultyProducts        FaultyProduct[]
+  importReceipts        ImportReceipt[]
+  inventories           Inventory[]
+  inventoryTransactions InventoryTransaction[]
+  stocktakings          Stocktaking[]
+  transfersFrom         TransferRequest[]      @relation("TransferFrom")
+  transfersTo           TransferRequest[]      @relation("TransferTo")
+  branch                Branch?                @relation(fields: [branchId], references: [id])
+
+  @@map("warehouses")
+}
+
+model Inventory {
+  id                Int       @id @default(autoincrement())
+  warehouseId       Int       @map("warehouse_id")
+  productId         Int       @map("product_id")
+  availableQuantity Int       @default(0) @map("available_quantity")
+  faultyQuantity    Int       @default(0) @map("faulty_quantity")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+  product           Product   @relation(fields: [productId], references: [id])
+  warehouse         Warehouse @relation(fields: [warehouseId], references: [id])
+
+  @@unique([warehouseId, productId], name: "uq_inventories_wh_prod")
+  @@map("inventories")
+}
+
+model InventoryTransaction {
+  id                Int                      @id @default(autoincrement())
+  warehouseId       Int                      @map("warehouse_id")
+  productId         Int                      @map("product_id")
+  type              InventoryTransactionType
+  quantity          Int
+  importReceiptId   Int?                     @map("import_receipt_id")
+  transferRequestId Int?                     @map("transfer_request_id")
+  posOrderId        Int?                     @map("pos_order_id")
+  onlineOrderId     Int?                     @map("online_order_id")
+  faultyProductId   Int?                     @map("faulty_product_id")
+  stocktakingId     Int?                     @map("stocktaking_id")
+  createdBy         Int                      @map("created_by")
+  createdAt         DateTime                 @default(now()) @map("created_at")
+  creator           User                     @relation(fields: [createdBy], references: [id])
+  faultyProduct     FaultyProduct?           @relation(fields: [faultyProductId], references: [id])
+  importReceipt     ImportReceipt?           @relation(fields: [importReceiptId], references: [id])
+  onlineOrder       Order?                   @relation(fields: [onlineOrderId], references: [id])
+  posOrder          PosOrder?                @relation(fields: [posOrderId], references: [id])
+  product           Product                  @relation(fields: [productId], references: [id])
+  stocktaking       Stocktaking?             @relation(fields: [stocktakingId], references: [id])
+  transferRequest   TransferRequest?         @relation(fields: [transferRequestId], references: [id])
+  warehouse         Warehouse                @relation(fields: [warehouseId], references: [id])
+
+  @@index([warehouseId, createdAt], map: "idx_inv_tx_warehouse_date")
+  @@index([productId], map: "idx_inv_tx_product")
+  @@map("inventory_transactions")
+}
+
+model ImportReceipt {
+  id                    Int                    @id @default(autoincrement())
+  warehouseId           Int                    @map("warehouse_id")
+  supplierId            Int                    @map("supplier_id")
+  createdBy             Int                    @map("created_by")
+  note                  String?
+  createdAt             DateTime               @default(now()) @map("created_at")
+  items                 ImportReceiptItem[]
+  creator               User                   @relation(fields: [createdBy], references: [id])
+  supplier              Supplier               @relation(fields: [supplierId], references: [id])
+  warehouse             Warehouse              @relation(fields: [warehouseId], references: [id])
+  inventoryTransactions InventoryTransaction[]
+
+  @@index([warehouseId], map: "idx_import_receipts_warehouse")
+  @@map("import_receipts")
+}
+
+model ImportReceiptItem {
+  id          Int           @id @default(autoincrement())
+  receiptId   Int           @map("receipt_id")
+  productId   Int           @map("product_id")
+  quantity    Int
+  importPrice Decimal       @map("import_price") @db.Decimal(15, 2)
+  product     Product       @relation(fields: [productId], references: [id])
+  receipt     ImportReceipt @relation(fields: [receiptId], references: [id], onDelete: Cascade)
+
+  @@map("import_receipt_items")
+}
+
+model TransferRequest {
+  id                    Int                    @id @default(autoincrement())
+  fromWarehouseId       Int                    @map("from_warehouse_id")
+  toWarehouseId         Int                    @map("to_warehouse_id")
+  requestedBy           Int                    @map("requested_by")
+  approvedBy            Int?                   @map("approved_by")
+  receivedBy            Int?                   @map("received_by")
+  status                TransferStatus         @default(PENDING)
+  note                  String?
+  receivedAt            DateTime?              @map("received_at")
+  completedAt           DateTime?              @map("completed_at")
+  createdAt             DateTime               @default(now()) @map("created_at")
+  inventoryTransactions InventoryTransaction[]
+  items                 TransferRequestItem[]
+  approver              User?                  @relation("TransferApprovedBy", fields: [approvedBy], references: [id])
+  fromWarehouse         Warehouse              @relation("TransferFrom", fields: [fromWarehouseId], references: [id])
+  receiver              User?                  @relation("TransferReceivedBy", fields: [receivedBy], references: [id])
+  requester             User                   @relation("TransferRequestedBy", fields: [requestedBy], references: [id])
+  toWarehouse           Warehouse              @relation("TransferTo", fields: [toWarehouseId], references: [id])
+
+  @@index([status], map: "idx_transfer_status")
+  @@map("transfer_requests")
+}
+
+model TransferRequestItem {
+  id        Int             @id @default(autoincrement())
+  requestId Int             @map("request_id")
+  productId Int             @map("product_id")
+  quantity  Int
+  product   Product         @relation(fields: [productId], references: [id])
+  request   TransferRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  @@map("transfer_request_items")
+}
+
+model Shift {
+  id           Int          @id @default(autoincrement())
+  branchId     Int          @map("branch_id")
+  name         String       @db.VarChar(100)
+  startTime    DateTime     @map("start_time")
+  endTime      DateTime?    @map("end_time")
+  openedBy     Int          @map("opened_by")
+  closedBy     Int?         @map("closed_by")
+  closedAt     DateTime?    @map("closed_at")
+  totalRevenue Decimal      @default(0) @map("total_revenue") @db.Decimal(15, 2)
+  status       ShiftStatus  @default(OPEN)
+  createdAt    DateTime     @default(now()) @map("created_at")
+  posOrders    PosOrder[]
+  shiftStaffs  ShiftStaff[]
+  branch       Branch       @relation(fields: [branchId], references: [id])
+  closer       User?        @relation("ShiftClosedBy", fields: [closedBy], references: [id])
+  opener       User         @relation("ShiftOpenedBy", fields: [openedBy], references: [id])
+
+  @@index([branchId, status], map: "idx_shifts_branch_status")
+  @@map("shifts")
+}
+
+model ShiftStaff {
+  id       Int       @id @default(autoincrement())
+  shiftId  Int       @map("shift_id")
+  staffId  Int       @map("staff_id")
+  joinedAt DateTime  @default(now()) @map("joined_at")
+  leftAt   DateTime? @map("left_at")
+  shift    Shift     @relation(fields: [shiftId], references: [id])
+  staff    User      @relation(fields: [staffId], references: [id])
+
+  @@map("shift_staffs")
+}
+
+model BranchStaff {
+  id         Int      @id @default(autoincrement())
+  branchId   Int      @map("branch_id")
+  staffId    Int      @map("staff_id")
+  assignedAt DateTime @default(now()) @map("assigned_at")
+  branch     Branch   @relation(fields: [branchId], references: [id])
+  staff      User     @relation(fields: [staffId], references: [id])
+
+  @@unique([branchId, staffId], name: "uq_branch_staff")
+  @@map("branch_staffs")
+}
+
+model PosOrder {
+  id                    Int                    @id @default(autoincrement())
+  branchId              Int                    @map("branch_id")
+  staffId               Int                    @map("staff_id")
+  shiftId               Int                    @map("shift_id")
+  totalAmount           Decimal                @default(0) @map("total_amount") @db.Decimal(15, 2)
+  paymentMethod         PosPaymentMethod       @map("payment_method")
+  status                PosOrderStatus         @default(COMPLETED)
+  note                  String?                @db.VarChar(500)
+  createdAt             DateTime               @default(now()) @map("created_at")
+  inventoryTransactions InventoryTransaction[]
+  payments              Payment[]
+  items                 PosOrderItem[]
+  branch                Branch                 @relation(fields: [branchId], references: [id])
+  shift                 Shift                  @relation(fields: [shiftId], references: [id])
+  staff                 User                   @relation(fields: [staffId], references: [id])
+
+  @@index([shiftId], map: "idx_pos_orders_shift")
+  @@index([branchId, createdAt], map: "idx_pos_orders_branch_date")
+  @@map("pos_orders")
+}
+
+model PosOrderItem {
+  id         Int      @id @default(autoincrement())
+  posOrderId Int      @map("pos_order_id")
+  productId  Int      @map("product_id")
+  quantity   Int
+  price      Decimal  @db.Decimal(15, 2)
+  posOrder   PosOrder @relation(fields: [posOrderId], references: [id], onDelete: Cascade)
+  product    Product  @relation(fields: [productId], references: [id])
+
+  @@map("pos_order_items")
+}
+
+model Cart {
+  id         Int        @id @default(autoincrement())
+  customerId Int        @map("customer_id")
+  createdAt  DateTime   @default(now()) @map("created_at")
+  updatedAt  DateTime   @updatedAt @map("updated_at")
+  items      CartItem[]
+  customer   User       @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@map("carts")
+}
+
+model CartItem {
+  id        Int     @id @default(autoincrement())
+  cartId    Int     @map("cart_id")
+  productId Int     @map("product_id")
+  quantity  Int     @default(1)
+  cart      Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id])
+
+  @@unique([cartId, productId], name: "uq_cart_product")
+  @@map("cart_items")
+}
+
+model Order {
+  id                    Int                    @id @default(autoincrement())
+  customerId            Int                    @map("customer_id")
+  branchId              Int                    @map("branch_id")
+  assignedStaffId       Int?                   @map("assigned_staff_id")
+  shippingAddress       String                 @map("shipping_address") @db.VarChar(500)
+  paymentMethod         OrderPaymentMethod     @map("payment_method")
+  status                OrderStatus            @default(PENDING)
+  totalAmount           Decimal                @default(0) @map("total_amount") @db.Decimal(15, 2)
+  trackingNumber        String?                @map("tracking_number") @db.VarChar(100)
+  note                  String?                @db.VarChar(500)
+  confirmedAt           DateTime?              @map("confirmed_at")
+  packedAt              DateTime?              @map("packed_at")
+  shippedAt             DateTime?              @map("shipped_at")
+  deliveredAt           DateTime?              @map("delivered_at")
+  cancelledAt           DateTime?              @map("cancelled_at")
+  createdAt             DateTime               @default(now()) @map("created_at")
+  updatedAt             DateTime               @updatedAt @map("updated_at")
+  inventoryTransactions InventoryTransaction[]
+  items                 OrderItem[]
+  statusHistories       OrderStatusHistory[]
+  assignedStaff         User?                  @relation("OrderAssignedStaff", fields: [assignedStaffId], references: [id])
+  branch                Branch                 @relation(fields: [branchId], references: [id])
+  customer              User                   @relation("OrderCustomer", fields: [customerId], references: [id])
+  payments              Payment[]
+
+  @@index([customerId], map: "idx_orders_customer")
+  @@index([branchId, status], map: "idx_orders_branch_status")
+  @@index([assignedStaffId], map: "idx_orders_staff")
+  @@index([createdAt], map: "idx_orders_created")
+  @@map("orders")
+}
+
+model OrderItem {
+  id        Int     @id @default(autoincrement())
+  orderId   Int     @map("order_id")
+  productId Int     @map("product_id")
+  quantity  Int
+  price     Decimal @db.Decimal(15, 2)
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id])
+
+  @@map("order_items")
+}
+
+model Payment {
+  id              Int           @id @default(autoincrement())
+  orderId         Int?          @map("order_id")
+  posOrderId      Int?          @map("pos_order_id")
+  method          PaymentMethod
+  amount          Decimal       @db.Decimal(15, 2)
+  status          PaymentStatus @default(PENDING)
+  transactionCode String?       @map("transaction_code") @db.VarChar(100)
+  paidAt          DateTime?     @map("paid_at")
+  order           Order?        @relation(fields: [orderId], references: [id])
+  posOrder        PosOrder?     @relation(fields: [posOrderId], references: [id])
+
+  @@index([orderId], map: "idx_payments_order")
+  @@index([posOrderId], map: "idx_payments_pos_order")
+  @@map("payments")
+}
+
+model OrderStatusHistory {
+  id        Int      @id @default(autoincrement())
+  orderId   Int      @map("order_id")
+  oldStatus String?  @map("old_status") @db.VarChar(50)
+  newStatus String   @map("new_status") @db.VarChar(50)
+  changedBy Int      @map("changed_by")
+  changedAt DateTime @default(now()) @map("changed_at")
+  changer   User     @relation(fields: [changedBy], references: [id])
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId], map: "idx_order_status_histories_order")
+  @@map("order_status_histories")
+}
+
+model FaultyProduct {
+  id                    Int                    @id @default(autoincrement())
+  warehouseId           Int                    @map("warehouse_id")
+  productId             Int                    @map("product_id")
+  reportedBy            Int                    @map("reported_by")
+  resolvedBy            Int?                   @map("resolved_by")
+  quantity              Int
+  reason                String
+  status                FaultyStatus           @default(PENDING)
+  resolvedAt            DateTime?              @map("resolved_at")
+  createdAt             DateTime               @default(now()) @map("created_at")
+  product               Product                @relation(fields: [productId], references: [id])
+  reporter              User                   @relation("FaultyReportedBy", fields: [reportedBy], references: [id])
+  resolver              User?                  @relation("FaultyResolvedBy", fields: [resolvedBy], references: [id])
+  warehouse             Warehouse              @relation(fields: [warehouseId], references: [id])
+  inventoryTransactions InventoryTransaction[]
+
+  @@index([warehouseId], map: "idx_faulty_warehouse")
+  @@index([status], map: "idx_faulty_status")
+  @@map("faulty_products")
+}
+
+model Stocktaking {
+  id                    Int                    @id @default(autoincrement())
+  warehouseId           Int                    @map("warehouse_id")
+  createdBy             Int                    @map("created_by")
+  confirmedBy           Int?                   @map("confirmed_by")
+  confirmedAt           DateTime?              @map("confirmed_at")
+  status                StocktakingStatus      @default(DRAFT)
+  note                  String?
+  createdAt             DateTime               @default(now()) @map("created_at")
+  inventoryTransactions InventoryTransaction[]
+  items                 StocktakingItem[]
+  confirmer             User?                  @relation("StocktakingConfirmedBy", fields: [confirmedBy], references: [id])
+  creator               User                   @relation("StocktakingCreatedBy", fields: [createdBy], references: [id])
+  warehouse             Warehouse              @relation(fields: [warehouseId], references: [id])
+
+  @@index([warehouseId], map: "idx_stocktakings_warehouse")
+  @@map("stocktakings")
+}
+
+model StocktakingItem {
+  id             Int         @id @default(autoincrement())
+  stocktakingId  Int         @map("stocktaking_id")
+  productId      Int         @map("product_id")
+  systemQuantity Int         @map("system_quantity")
+  actualQuantity Int         @map("actual_quantity")
+  product        Product     @relation(fields: [productId], references: [id])
+  stocktaking    Stocktaking @relation(fields: [stocktakingId], references: [id], onDelete: Cascade)
+
+  @@unique([stocktakingId, productId], name: "uq_stocktaking_product")
+  @@map("stocktaking_items")
+}
+
+model AuditLog {
+  id          BigInt   @id @default(autoincrement())
+  userId      Int      @map("user_id")
+  module      String   @db.VarChar(50)
+  action      String   @db.VarChar(50)
+  description String?
+  oldValue    Json?    @map("old_value")
+  newValue    Json?    @map("new_value")
+  ipAddress   String?  @map("ip_address") @db.VarChar(45)
+  createdAt   DateTime @default(now()) @map("created_at")
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@index([userId, module, createdAt], map: "idx_audit_user_module_date")
+  @@map("audit_logs")
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  title     String   @db.VarChar(200)
+  message   String
+  isRead    Boolean  @default(false) @map("is_read")
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead], map: "idx_notifications_user_read")
+  @@map("notifications")
+}
+
+enum BranchStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  BANNED
+}
+
+enum ProductStatus {
+  ACTIVE
+  INACTIVE
+  OUT_OF_STOCK
+}
+
+enum SupplierStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum WarehouseType {
+  MAIN
+  BRANCH
+}
+
+enum InventoryTransactionType {
+  IMPORT
+  EXPORT
+  TRANSFER_OUT
+  TRANSFER_IN
+  POS_SELL
+  ONLINE_ORDER
+  FAULTY_REPORT
+  FAULTY_RESOLVE
+  STOCKTAKE_ADJUST
+}
+
+enum TransferStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  COMPLETED
+  CANCELLED
+}
+
+enum ShiftStatus {
+  OPEN
+  CLOSED
+}
+
+enum PosPaymentMethod {
+  CASH
+  CARD
+  TRANSFER
+  MOMO
+  VNPAY
+}
+
+enum PosOrderStatus {
+  COMPLETED
+  REFUNDED
+  CANCELLED
+}
+
+enum OrderPaymentMethod {
+  COD
+  CARD
+  TRANSFER
+  MOMO
+  VNPAY
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PACKING
+  SHIPPING
+  DELIVERED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  CASH
+  CARD
+  TRANSFER
+  MOMO
+  VNPAY
+  COD
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum FaultyStatus {
+  PENDING
+  REPAIRING
+  WARRANTY
+  DISPOSAL
+  DESTROYED
+  RESOLVED
+}
+
+enum StocktakingStatus {
+  DRAFT
+  SUBMITTED
+  CONFIRMED
+}
