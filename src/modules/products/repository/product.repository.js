@@ -26,5 +26,11 @@ async function findMany({skip=0, take=10,search,categoryId}){
         prisma.product.count(filter),
     ]);
     return {items,total};
-} 
-module.exports={findMany};
+}
+async function findById(id) {
+  return prisma.product.findUnique({
+    where: { id: Number(id) },
+    include: { category: true, images: true },
+  });
+}
+module.exports={findMany, findById};

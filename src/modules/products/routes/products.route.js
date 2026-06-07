@@ -8,6 +8,6 @@ const { requireRole } = require('../../../middlewares/role.middleware');
 const router = express.Router();
 
 router.get('/', controller.list);
-
+router.get('/:id', controller.get);
 
 module.exports = router;
