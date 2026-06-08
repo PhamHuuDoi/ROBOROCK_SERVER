@@ -1,11 +1,12 @@
 const express = require('express');
 const routes = require('./routes');
 const env = require('./config/env');
-
+const {startCleanupJob} = require("./jobs/cleanupProducts.job");
 const app = express();
 app.use(express.json());
 
 app.use('/api', routes);
+startCleanupJob();
 
 // basic error handler
 app.use((err, req, res, next) => {
