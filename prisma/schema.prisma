@@ -11,6 +11,7 @@ model Role {
   id    Int    @id @default(autoincrement())
   name  String @unique @db.VarChar(50)
   users User[]
+
   @@map("roles")
 }
 
@@ -39,7 +40,8 @@ model User {
   roleId                Int                    @map("role_id")
   fullName              String                 @map("full_name") @db.VarChar(100)
   email                 String                 @unique @db.VarChar(100)
-  password              String                 @db.VarChar(255)
+  // nullable: user login bằng Google sẽ không có password
+  password              String?                @db.VarChar(255)
   status                UserStatus             @default(ACTIVE)
   createdAt             DateTime               @default(now()) @map("created_at")
   updatedAt             DateTime               @updatedAt @map("updated_at")
@@ -52,11 +54,13 @@ model User {
   importReceipts        ImportReceipt[]
   inventoryTransactions InventoryTransaction[]
   notifications         Notification[]
+  oauthAccounts         OAuthAccount[]
   orderStatusChanges    OrderStatusHistory[]
   assignedOrders        Order[]                @relation("OrderAssignedStaff")
   orders                Order[]                @relation("OrderCustomer")
   posOrders             PosOrder[]
   profiles              Profile[]
+  refreshTokens         RefreshToken[]
   shiftStaffs           ShiftStaff[]
   closedShifts          Shift[]                @relation("ShiftClosedBy")
   openedShifts          Shift[]                @relation("ShiftOpenedBy")
@@ -70,6 +74,35 @@ model User {
   @@map("users")
 }
 
+model OAuthAccount {
+  id           Int       @id @default(autoincrement())
+  userId       Int       @map("user_id")
+  provider     String    @db.VarChar(50)
+  providerUid  String    @map("provider_uid") @db.VarChar(255)
+  accessToken  String?   @map("access_token") @db.VarChar(512)
+  refreshToken String?   @map("refresh_token") @db.VarChar(512)
+  expiresAt    DateTime? @map("expires_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerUid], name: "uq_oauth_provider_uid")
+  @@index([userId], map: "idx_oauth_user")
+  @@map("oauth_accounts")
+}
+
+model RefreshToken {
+  id         Int      @id @default(autoincrement())
+  userId     Int      @map("user_id")
+  token      String   @unique @db.VarChar(512)
+  deviceInfo String?  @map("device_info") @db.VarChar(100)
+  expiresAt  DateTime @map("expires_at")
+  createdAt  DateTime @default(now()) @map("created_at")
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId], map: "idx_refresh_tokens_user")
+  @@map("refresh_tokens")
+}
+
 model Profile {
   id        Int     @id @default(autoincrement())
   userId    Int     @map("user_id")
@@ -78,6 +111,7 @@ model Profile {
   isDefault Boolean @default(false) @map("is_default")
   user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId], map: "idx_profiles_user")
   @@map("profiles")
 }
 
@@ -165,6 +199,8 @@ model Warehouse {
   transfersTo           TransferRequest[]      @relation("TransferTo")
   branch                Branch?                @relation(fields: [branchId], references: [id])
 
+  @@unique([branchId, name], name: "uq_warehouse_branch_name")
+  @@index([branchId], map: "idx_warehouses_branch")
   @@map("warehouses")
 }
 
@@ -237,6 +273,7 @@ model ImportReceiptItem {
   product     Product       @relation(fields: [productId], references: [id])
   receipt     ImportReceipt @relation(fields: [receiptId], references: [id], onDelete: Cascade)
 
+  @@unique([receiptId, productId], name: "uq_receipt_product")
   @@map("import_receipt_items")
 }
 
@@ -272,6 +309,7 @@ model TransferRequestItem {
   product   Product         @relation(fields: [productId], references: [id])
   request   TransferRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
 
+  @@unique([requestId, productId], name: "uq_transfer_product")
   @@map("transfer_request_items")
 }
 
@@ -536,6 +574,10 @@ model Notification {
   @@index([userId, isRead], map: "idx_notifications_user_read")
   @@map("notifications")
 }
+
+// ─────────────────────────────────────────
+// ENUMS
+// ─────────────────────────────────────────
 
 enum BranchStatus {
   ACTIVE
