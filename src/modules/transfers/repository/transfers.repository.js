@@ -31,17 +31,26 @@ async function findAll({ skip = 0, take = 10, status, fromWarehouseId, toWarehou
 
   return { items, total };
 }
-
+async function findById(id) {
+  return prisma.transferRequest.findUnique({
+    where: { id: Number(id) },
+    include: {
+      fromWarehouse: { select: { id: true, name: true } },
+      toWarehouse:   { select: { id: true, name: true } },
+      requester:     { select: { id: true, fullName: true } },
+      approver:      { select: { id: true, fullName: true } },
+      receiver:      { select: { id: true, fullName: true } },
+      items: {
+        include: {
+          product: { select: { id: true, name: true, sku: true, thumbnail: true } },
+        },
+      },
+    },
+  });
+}
 
 
 module.exports = {
   findAll,
   findById,
-  create,
-  updateStatus,
-  findWarehouseById,
-  findInventory,
-  decrementInventory,
-  incrementInventory,
-  createTransaction,
 };

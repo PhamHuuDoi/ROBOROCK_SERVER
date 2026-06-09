@@ -21,8 +21,16 @@ async function getAllTransfers({ page = 1, limit = 10, status, fromWarehouseId, 
     },
   };
 }
+// Lấy chi tiết 1 yêu cầu chuyển kho, throw 404 nếu không tìm thấy
+async function getTransferById(id) {
+  const transfer = await repo.findById(id);
+  if (!transfer) throw { status: 404, message: "Transfer request not found" };
+  return transfer;
+}
 
 
 module.exports = {
-  getAllTransfers,
+  getAllTransfers,  
+  getTransferById,
+  
 };

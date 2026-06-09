@@ -13,7 +13,11 @@ router.get("/",
   validate(validation.queryTransferSchema, "query"),
   controller.getAll
 );
-
+router.get("/:id",
+  authMiddleware,
+  requireRole("SYSTEM_ADMIN", "WAREHOUSE_MANAGER", "STORE_MANAGER"),
+  controller.getById
+)
 
 
 module.exports = router;

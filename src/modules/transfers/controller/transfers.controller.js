@@ -9,7 +9,15 @@ async function getAll(req, res, next) {
     next(err);
   }
 }
-
+// Lấy chi tiết 1 yêu cầu chuyển kho
+async function getById(req, res, next) {
+  try {
+    const result = await service.getTransferById(req.params.id);
+    res.json(result);
+  } catch (err) {
+    next(err);
+  }
+}
 
 
 module.exports = { getAll};
