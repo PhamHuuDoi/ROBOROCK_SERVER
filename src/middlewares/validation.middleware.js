@@ -1,9 +1,9 @@
 const { ZodError } = require('zod');
 
-function validate(schema) {
+function validate(schema, source = 'body') {
   return (req, res, next) => {
     try {
-      req.validated = schema.parse(req.body);
+      req.validated = schema.parse(req[source]);
       next();
     } catch (err) {
       if (err instanceof ZodError) {
