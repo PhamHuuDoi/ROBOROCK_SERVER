@@ -48,9 +48,49 @@ async function findById(id) {
     },
   });
 }
-
+// Lấy thông tin kho theo id
+async function findWarehouseById(id) {
+  return prisma.warehouse.findUnique({ where: { id: Number(id) } });
+}
+// Lấy tồn kho của 1 sản phẩm trong 1 kho
+async function findInventory(warehouseId, productId) {
+  return prisma.inventory.findUnique({
+    where: {
+      uq_inventories_wh_prod: { warehouseId, productId },
+    },
+  });
+}
+// Tạo yêu cầu chuyển kho mới
+async function create({ fromWarehouseId, toWarehouseId, requestedBy, note, items }) {
+  return prisma.transferRequest.create({
+    data: {
+      fromWarehouseId,
+      toWarehouseId,
+      requestedBy,
+      note,
+      items: {
+        create: items.map((i) => ({
+          productId: i.productId,
+          quantity:  i.quantity,
+        })),
+      },
+    },
+    include: {
+      fromWarehouse: { select: { id: true, name: true } },
+      toWarehouse:   { select: { id: true, name: true } },
+      items: {
+        include: {
+          product: { select: { id: true, name: true, sku: true } },
+        },
+      },
+    },
+  });
+}
 
 module.exports = {
   findAll,
   findById,
+  findWarehouseById,
+  findInventory,
+  create
 };

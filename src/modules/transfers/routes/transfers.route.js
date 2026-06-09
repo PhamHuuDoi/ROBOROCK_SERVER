@@ -13,11 +13,19 @@ router.get("/",
   validate(validation.queryTransferSchema, "query"),
   controller.getAll
 );
+// Lấy chi tiết 1 yêu cầu chuyển kho
 router.get("/:id",
   authMiddleware,
   requireRole("SYSTEM_ADMIN", "WAREHOUSE_MANAGER", "STORE_MANAGER"),
   controller.getById
 )
+// Tạo yêu cầu chuyển kho
+router.post("/",
+  authMiddleware,
+  requireRole("SYSTEM_ADMIN", "WAREHOUSE_MANAGER", "STORE_MANAGER"),
+  validate(validation.createTransferSchema),
+  controller.create
+);
 
 
 module.exports = router;
