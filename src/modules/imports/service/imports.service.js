@@ -28,6 +28,16 @@ async function getImportById(id) {
 
 async function createImport({ warehouseId, supplierId, note, items }, userId) {
   // 1. Tạo phiếu nhập
+    const warehouse = await repo.findWarehouse(warehouseId);
+
+    if (!warehouse) {
+        throw { status: 404, message: "Warehouse not found" };
+    }
+
+    if (warehouse.type !== "MAIN") {
+        throw { status: 400, message: "Chỉ được nhập hàng vào kho tổng (MAIN)" };
+    }
+
   const receipt = await repo.create({
     warehouseId,
     supplierId,

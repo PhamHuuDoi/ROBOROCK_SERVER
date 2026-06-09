@@ -86,11 +86,15 @@ async function upsertInventory(warehouseId, productId, quantity) {
 async function createTransaction(data) {
   return prisma.inventoryTransaction.create({ data });
 }
-
+async function findWarehouse(warehouseId) {
+  return await prisma.warehouse.findUnique({
+    where: { id: warehouseId },
+  });}
 module.exports = {
   findAll,
   findById,
   create,
   upsertInventory,
   createTransaction,
-};
+findWarehouse,
+}
