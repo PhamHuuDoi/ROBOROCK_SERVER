@@ -125,60 +125,91 @@ async function completeTransfer(id, userId) {
   const transfer = await getTransferById(id);
 
   if (transfer.status !== "APPROVED") {
-    throw { status: 400, message: `Không thể hoàn thành đơn có trạng thái ${transfer.status}` };
+    throw {
+      status: 400,
+      message: `Không thể hoàn thành đơn có trạng thái ${transfer.status}`,
+    };
   }
 
   for (const item of transfer.items) {
     // Kiểm tra lại tồn kho lần 2 tránh race condition
-    const inventory = await repo.findInventory(transfer.fromWarehouseId, item.productId);
+    const inventory = await repo.findInventory(
+      transfer.fromWarehouseId,
+      item.productId,
+    );
     if (!inventory || inventory.availableQuantity < item.quantity) {
       throw {
-        status:  400,
+        status: 400,
         message: `Không đủ hàng cho sản phẩm ${item.productId} khi hoàn thành`,
       };
     }
 
     // Trừ kho nguồn
-    await repo.decrementInventory(transfer.fromWarehouseId, item.productId, item.quantity);
+    await repo.decrementInventory(
+      transfer.fromWarehouseId,
+      item.productId,
+      item.quantity,
+    );
 
     // Cộng kho đích
-    await repo.incrementInventory(transfer.toWarehouseId, item.productId, item.quantity);
+    await repo.incrementInventory(
+      transfer.toWarehouseId,
+      item.productId,
+      item.quantity,
+    );
 
     // Ghi transaction xuất kho nguồn
     await repo.createTransaction({
-      warehouseId:       transfer.fromWarehouseId,
-      productId:         item.productId,
-      type:              "TRANSFER_OUT",
-      quantity:          item.quantity,
+      warehouseId: transfer.fromWarehouseId,
+      productId: item.productId,
+      type: "TRANSFER_OUT",
+      quantity: item.quantity,
       transferRequestId: transfer.id,
-      createdBy:         userId,
+      createdBy: userId,
     });
 
     // Ghi transaction nhập kho đích
     await repo.createTransaction({
-      warehouseId:       transfer.toWarehouseId,
-      productId:         item.productId,
-      type:              "TRANSFER_IN",
-      quantity:          item.quantity,
+      warehouseId: transfer.toWarehouseId,
+      productId: item.productId,
+      type: "TRANSFER_IN",
+      quantity: item.quantity,
       transferRequestId: transfer.id,
-      createdBy:         userId,
+      createdBy: userId,
     });
   }
 
   return repo.updateStatus(id, {
-    status:      "COMPLETED",
-    receivedBy:  userId,
-    receivedAt:  new Date(),
+    status: "COMPLETED",
+    receivedBy: userId,
+    receivedAt: new Date(),
     completedAt: new Date(),
   });
 }
+// Huỷ yêu cầu chuyển kho, Store Manager chỉ huỷ được đơn mình tạo
+async function cancelTransfer(id, userId, userRole) {
+  const transfer = await getTransferById(id);
+
+  if (userRole === "STORE_MANAGER" && transfer.requestedBy !== userId) {
+    throw { status: 403, message: "Bạn không có quyền huỷ đơn này" };
+  }
+
+  if (!["PENDING", "APPROVED"].includes(transfer.status)) {
+    throw {
+      status: 400,
+      message: `Không thể huỷ đơn có trạng thái ${transfer.status}`,
+    };
+  }
+
+  return repo.updateStatus(id, { status: "CANCELLED" });
+}
+
 module.exports = {
   getAllTransfers,
   getTransferById,
   createTransfer,
   approveTransfer,
   rejectTransfer,
-  approveTransfer,
-  rejectTransfer,
- completeTransfer,
+  completeTransfer,
+  cancelTransfer,
 };

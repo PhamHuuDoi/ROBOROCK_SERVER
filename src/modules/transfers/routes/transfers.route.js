@@ -45,6 +45,12 @@ router.patch("/:id/complete",
   requireRole("SYSTEM_ADMIN", "WAREHOUSE_MANAGER", "STORE_MANAGER"),
   controller.complete
 );
+// Huỷ yêu cầu chuyển kho
+router.patch("/:id/cancel",
+  authMiddleware,
+  requireRole("SYSTEM_ADMIN", "WAREHOUSE_MANAGER", "STORE_MANAGER"),
+  controller.cancel
+);
 
 
 module.exports = router;

@@ -59,4 +59,19 @@ async function complete(req, res, next) {
     next(err);
   }
 }
-module.exports = { getAll, getById, create, approve, reject, complete };
+
+// Huỷ yêu cầu chuyển kho
+async function cancel(req, res, next) {
+  try {
+    const result = await service.cancelTransfer(
+      req.params.id,
+      req.user.id,
+      req.user.role,
+    );
+    res.json(result);
+  } catch (err) {
+    next(err);
+  }
+}
+
+module.exports = { getAll, getById, create, approve, reject, complete, cancel};
