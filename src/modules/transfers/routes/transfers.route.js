@@ -39,6 +39,12 @@ router.patch("/:id/reject",
   requireRole("SYSTEM_ADMIN", "WAREHOUSE_MANAGER"),
   controller.reject
 );
+// Hoàn thành chuyển kho, cập nhật tồn kho
+router.patch("/:id/complete",
+  authMiddleware,
+  requireRole("SYSTEM_ADMIN", "WAREHOUSE_MANAGER", "STORE_MANAGER"),
+  controller.complete
+);
 
 
 module.exports = router;

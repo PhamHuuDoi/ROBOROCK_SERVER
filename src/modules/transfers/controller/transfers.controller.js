@@ -50,5 +50,13 @@ async function reject(req, res, next) {
     next(err);
   }
 }
-
-module.exports = { getAll, getById, create, approve, reject };
+// Hoàn thành chuyển kho, cập nhật tồn kho
+async function complete(req, res, next) {
+  try {
+    const result = await service.completeTransfer(req.params.id, req.user.id);
+    res.json(result);
+  } catch (err) {
+    next(err);
+  }
+}
+module.exports = { getAll, getById, create, approve, reject, complete };

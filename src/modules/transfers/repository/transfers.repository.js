@@ -107,7 +107,30 @@ async function updateStatus(id, data) {
     data,
   });
 }
+// Trừ tồn kho kho nguồn
+async function decrementInventory(warehouseId, productId, quantity) {
+  return prisma.inventory.update({
+    where: {
+      uq_inventories_wh_prod: { warehouseId, productId },
+    },
+    data: { availableQuantity: { decrement: quantity } },
+  });
+}
+// Cộng tồn kho kho đích, tạo mới nếu chưa có
+async function incrementInventory(warehouseId, productId, quantity) {
+  return prisma.inventory.upsert({
+    where: {
+      uq_inventories_wh_prod: { warehouseId, productId },
+    },
+    update: { availableQuantity: { increment: quantity } },
+    create: { warehouseId, productId, availableQuantity: quantity },
+  });
+}
 
+// Tạo bản ghi lịch sử giao dịch kho
+async function createTransaction(data) {
+  return prisma.inventoryTransaction.create({ data });
+}
 module.exports = {
   findAll,
   findById,
@@ -115,4 +138,7 @@ module.exports = {
   findInventory,
   create,
   updateStatus,
+  decrementInventory,
+  incrementInventory,
+  createTransaction,
 };
