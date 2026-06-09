@@ -80,6 +80,23 @@ async function main() {
     }
 
   }
+  await prisma.branch.createMany({
+  skipDuplicates: true,
+  data: [
+    {
+      name:    "Chi Nhánh Quận 1",
+      address: "123 Nguyễn Huệ, Q1, HCM",
+      phone:   "0901234567",
+      email:   "q1@roborock.com",
+    },
+    {
+      name:    "Chi Nhánh Quận 7",
+      address: "456 Nguyễn Thị Thập, Q7, HCM",
+      phone:   "0907654321",
+      email:   "q7@roborock.com",
+    },
+  ],
+});
 
   console.log("Seed completed");
 }
