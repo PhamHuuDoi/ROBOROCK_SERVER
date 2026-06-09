@@ -3,11 +3,12 @@ const auth = require('../modules/auth');
 const category = require('../modules/categories');
 const products = require('../modules/products');
 const warehouse=require('../modules/warehouse');
+const branchs=require('../modules/branchs');
 const router = express.Router();
 
 router.use('/auth', auth);
 router.use('/categories', category);
 router.use('/products', products);
 router.use('/warehouses', warehouse);
-
+router.use('/branchs', branchs);
 module.exports = router;
