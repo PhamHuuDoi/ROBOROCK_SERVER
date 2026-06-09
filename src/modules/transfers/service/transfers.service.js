@@ -1,7 +1,13 @@
 const repo = require("../repository/transfers.repository");
 
 // Lấy danh sách yêu cầu chuyển kho có phân trang
-async function getAllTransfers({ page = 1, limit = 10, status, fromWarehouseId, toWarehouseId } = {}) {
+async function getAllTransfers({
+  page = 1,
+  limit = 10,
+  status,
+  fromWarehouseId,
+  toWarehouseId,
+} = {}) {
   const skip = (page - 1) * limit;
   const { items, total } = await repo.findAll({
     skip,
@@ -15,8 +21,8 @@ async function getAllTransfers({ page = 1, limit = 10, status, fromWarehouseId, 
     items,
     pagination: {
       total,
-      page:       Number(page),
-      limit:      Number(limit),
+      page: Number(page),
+      limit: Number(limit),
       totalPages: Math.ceil(total / limit),
     },
   };
@@ -28,20 +34,30 @@ async function getTransferById(id) {
   return transfer;
 }
 
-async function createTransfer({ fromWarehouseId, toWarehouseId, note, items }, userId, userRole) {
+async function createTransfer(
+  { fromWarehouseId, toWarehouseId, note, items },
+  userId,
+  userRole,
+) {
   const fromWarehouse = await repo.findWarehouseById(fromWarehouseId);
-  const toWarehouse   = await repo.findWarehouseById(toWarehouseId);
+  const toWarehouse = await repo.findWarehouseById(toWarehouseId);
 
   if (!fromWarehouse) throw { status: 404, message: "Kho nguồn không tồn tại" };
-  if (!toWarehouse)   throw { status: 404, message: "Kho đích không tồn tại" };
+  if (!toWarehouse) throw { status: 404, message: "Kho đích không tồn tại" };
 
   // Store Manager chỉ được xin hàng từ kho MAIN về kho BRANCH
   if (userRole === "STORE_MANAGER") {
     if (fromWarehouse.type !== "MAIN") {
-      throw { status: 400, message: "Store Manager chỉ được xin hàng từ kho tổng" };
+      throw {
+        status: 400,
+        message: "Store Manager chỉ được xin hàng từ kho tổng",
+      };
     }
     if (toWarehouse.type !== "BRANCH") {
-      throw { status: 400, message: "Store Manager chỉ được xin hàng về kho chi nhánh" };
+      throw {
+        status: 400,
+        message: "Store Manager chỉ được xin hàng về kho chi nhánh",
+      };
     }
   }
 
@@ -57,17 +73,60 @@ async function createTransfer({ fromWarehouseId, toWarehouseId, note, items }, u
     const inventory = await repo.findInventory(fromWarehouseId, item.productId);
     if (!inventory || inventory.availableQuantity < item.quantity) {
       throw {
-        status:  400,
+        status: 400,
         message: `Không đủ hàng cho sản phẩm ${item.productId}. Tồn kho: ${inventory?.availableQuantity ?? 0}`,
       };
     }
   }
 
-  return repo.create({ fromWarehouseId, toWarehouseId, requestedBy: userId, note, items });
+  return repo.create({
+    fromWarehouseId,
+    toWarehouseId,
+    requestedBy: userId,
+    note,
+    items,
+  });
+}
+// Duyệt yêu cầu chuyển kho, chỉ duyệt được khi status là PENDING
+async function approveTransfer(id, userId) {
+  const transfer = await getTransferById(id);
+
+  if (transfer.status !== "PENDING") {
+    throw {
+      status: 400,
+      message: `Không thể duyệt đơn có trạng thái ${transfer.status}`,
+    };
+  }
+
+  return repo.updateStatus(id, {
+    status: "APPROVED",
+    approvedBy: userId,
+  });
+}
+
+// Từ chối yêu cầu chuyển kho, chỉ từ chối được khi status là PENDING
+async function rejectTransfer(id, userId) {
+  const transfer = await getTransferById(id);
+
+  if (transfer.status !== "PENDING") {
+    throw {
+      status: 400,
+      message: `Không thể từ chối đơn có trạng thái ${transfer.status}`,
+    };
+  }
+
+  return repo.updateStatus(id, {
+    status: "REJECTED",
+    approvedBy: userId,
+  });
 }
 
 module.exports = {
-  getAllTransfers,  
+  getAllTransfers,
   getTransferById,
   createTransfer,
+  approveTransfer,
+  rejectTransfer,
+  approveTransfer,
+  rejectTransfer,
 };

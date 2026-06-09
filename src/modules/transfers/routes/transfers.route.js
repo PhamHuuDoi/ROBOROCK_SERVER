@@ -26,6 +26,19 @@ router.post("/",
   validate(validation.createTransferSchema),
   controller.create
 );
+// Duyệt yêu cầu chuyển kho
+router.patch("/:id/approve",
+  authMiddleware,
+  requireRole("SYSTEM_ADMIN", "WAREHOUSE_MANAGER"),
+  controller.approve
+);
+
+// Từ chối yêu cầu chuyển kho
+router.patch("/:id/reject",
+  authMiddleware,
+  requireRole("SYSTEM_ADMIN", "WAREHOUSE_MANAGER"),
+  controller.reject
+);
 
 
 module.exports = router;

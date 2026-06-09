@@ -1,11 +1,17 @@
 const prisma = require("../../../config/prisma");
 
 // Lấy danh sách yêu cầu chuyển kho có phân trang và filter
-async function findAll({ skip = 0, take = 10, status, fromWarehouseId, toWarehouseId } = {}) {
+async function findAll({
+  skip = 0,
+  take = 10,
+  status,
+  fromWarehouseId,
+  toWarehouseId,
+} = {}) {
   const where = {};
-  if (status)          where.status          = status;
+  if (status) where.status = status;
   if (fromWarehouseId) where.fromWarehouseId = Number(fromWarehouseId);
-  if (toWarehouseId)   where.toWarehouseId   = Number(toWarehouseId);
+  if (toWarehouseId) where.toWarehouseId = Number(toWarehouseId);
 
   const [items, total] = await Promise.all([
     prisma.transferRequest.findMany({
@@ -14,10 +20,10 @@ async function findAll({ skip = 0, take = 10, status, fromWarehouseId, toWarehou
       take,
       include: {
         fromWarehouse: { select: { id: true, name: true } },
-        toWarehouse:   { select: { id: true, name: true } },
-        requester:     { select: { id: true, fullName: true } },
-        approver:      { select: { id: true, fullName: true } },
-        receiver:      { select: { id: true, fullName: true } },
+        toWarehouse: { select: { id: true, name: true } },
+        requester: { select: { id: true, fullName: true } },
+        approver: { select: { id: true, fullName: true } },
+        receiver: { select: { id: true, fullName: true } },
         items: {
           include: {
             product: { select: { id: true, name: true, sku: true } },
@@ -36,13 +42,15 @@ async function findById(id) {
     where: { id: Number(id) },
     include: {
       fromWarehouse: { select: { id: true, name: true } },
-      toWarehouse:   { select: { id: true, name: true } },
-      requester:     { select: { id: true, fullName: true } },
-      approver:      { select: { id: true, fullName: true } },
-      receiver:      { select: { id: true, fullName: true } },
+      toWarehouse: { select: { id: true, name: true } },
+      requester: { select: { id: true, fullName: true } },
+      approver: { select: { id: true, fullName: true } },
+      receiver: { select: { id: true, fullName: true } },
       items: {
         include: {
-          product: { select: { id: true, name: true, sku: true, thumbnail: true } },
+          product: {
+            select: { id: true, name: true, sku: true, thumbnail: true },
+          },
         },
       },
     },
@@ -61,7 +69,13 @@ async function findInventory(warehouseId, productId) {
   });
 }
 // Tạo yêu cầu chuyển kho mới
-async function create({ fromWarehouseId, toWarehouseId, requestedBy, note, items }) {
+async function create({
+  fromWarehouseId,
+  toWarehouseId,
+  requestedBy,
+  note,
+  items,
+}) {
   return prisma.transferRequest.create({
     data: {
       fromWarehouseId,
@@ -71,13 +85,13 @@ async function create({ fromWarehouseId, toWarehouseId, requestedBy, note, items
       items: {
         create: items.map((i) => ({
           productId: i.productId,
-          quantity:  i.quantity,
+          quantity: i.quantity,
         })),
       },
     },
     include: {
       fromWarehouse: { select: { id: true, name: true } },
-      toWarehouse:   { select: { id: true, name: true } },
+      toWarehouse: { select: { id: true, name: true } },
       items: {
         include: {
           product: { select: { id: true, name: true, sku: true } },
@@ -86,11 +100,19 @@ async function create({ fromWarehouseId, toWarehouseId, requestedBy, note, items
     },
   });
 }
+// Cập nhật trạng thái yêu cầu chuyển kho
+async function updateStatus(id, data) {
+  return prisma.transferRequest.update({
+    where: { id: Number(id) },
+    data,
+  });
+}
 
 module.exports = {
   findAll,
   findById,
   findWarehouseById,
   findInventory,
-  create
+  create,
+  updateStatus,
 };

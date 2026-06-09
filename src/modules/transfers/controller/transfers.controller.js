@@ -31,4 +31,24 @@ async function create(req, res, next) {
     next(err);
   }
 }
-module.exports = { getAll, getById, create };
+// Duyệt yêu cầu chuyển kho
+async function approve(req, res, next) {
+  try {
+    const result = await service.approveTransfer(req.params.id, req.user.id);
+    res.json(result);
+  } catch (err) {
+    next(err);
+  }
+}
+
+// Từ chối yêu cầu chuyển kho
+async function reject(req, res, next) {
+  try {
+    const result = await service.rejectTransfer(req.params.id, req.user.id);
+    res.json(result);
+  } catch (err) {
+    next(err);
+  }
+}
+
+module.exports = { getAll, getById, create, approve, reject };
