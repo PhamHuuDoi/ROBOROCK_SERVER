@@ -6,6 +6,7 @@ const warehouse=require('../modules/warehouse');
 const branchs=require('../modules/branchs');
 const inventory=require('../modules/inventories');
 const imports=require('../modules/imports');
+const cart=require('../modules/cart');
 const router = express.Router();
 
 router.use('/auth', auth);
@@ -15,4 +16,5 @@ router.use('/warehouses', warehouse);
 router.use('/branchs', branchs);
 router.use('/inventory', inventory);
 router.use('/imports', imports);
+router.use('/cart', cart);
 module.exports = router;

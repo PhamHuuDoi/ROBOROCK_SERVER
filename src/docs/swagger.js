@@ -33,6 +33,7 @@ const options = {
       { name: "Inventory", description: "Quản lý tồn kho" },
       { name: "Transfer", description: "Quản lý yêu cầu chuyển kho" },
       { name: "Warehouse", description: "Quản lý kho hàng" },
+      { name: "Cart", description: "Quản lý giỏ hàng của khách hàng" },
     ],
   },
 
