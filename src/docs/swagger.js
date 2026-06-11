@@ -34,6 +34,8 @@ const options = {
       { name: "Transfer", description: "Quản lý yêu cầu chuyển kho" },
       { name: "Warehouse", description: "Quản lý kho hàng" },
       { name: "Cart", description: "Quản lý giỏ hàng của khách hàng" },
+      { name: "Order", description: "Quản lý đơn hàng" },
+      { name: "Payment", description: "Quản lý thanh toán đơn hàng" },
     ],
   },
 
