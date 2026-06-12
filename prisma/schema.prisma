@@ -72,7 +72,7 @@ model User {
   transfersReceived     TransferRequest[]      @relation("TransferReceivedBy")
   transfersRequested    TransferRequest[]      @relation("TransferRequestedBy")
   role                  Role                   @relation(fields: [roleId], references: [id])
-
+  deletedAt             DateTime?              @map("deleted_at")
   @@map("users")
 }
 
