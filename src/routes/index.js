@@ -9,6 +9,7 @@ const imports=require('../modules/imports');
 const cart=require('../modules/cart');
 const orders=require('../modules/order');
 const payments=require('../modules/payments');
+const profiles=require('../modules/profiles');
 const router = express.Router();
 
 router.use('/auth', auth);
@@ -21,4 +22,5 @@ router.use('/inventory', inventory);
 router.use('/imports', imports);
 router.use('/cart', cart);
 router.use('/orders', orders);
+router.use('/profiles', profiles);
 module.exports = router;
