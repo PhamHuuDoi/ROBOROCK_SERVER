@@ -10,6 +10,7 @@ const cart=require('../modules/cart');
 const orders=require('../modules/order');
 const payments=require('../modules/payments');
 const profiles=require('../modules/profiles');
+const users=require('../modules/users');
 const router = express.Router();
 
 router.use('/auth', auth);
@@ -23,4 +24,5 @@ router.use('/imports', imports);
 router.use('/cart', cart);
 router.use('/orders', orders);
 router.use('/profiles', profiles);
+router.use('/users', users);
 module.exports = router;

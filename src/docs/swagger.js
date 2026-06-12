@@ -37,6 +37,7 @@ const options = {
       { name: "Order", description: "Quản lý đơn hàng" },
       { name: "Payment", description: "Quản lý thanh toán đơn hàng" },
       {name: "Profile", description: "Quản lý profile (địa chỉ) của khách hàng" },
+      { name: "User", description: "Quản lý tài khoản nhân viên" },
     ],
   },
 
