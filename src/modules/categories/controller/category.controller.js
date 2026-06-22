@@ -1,13 +1,12 @@
 const service = require("../service/category.service");
+const MESSAGES = require("../../../shared/constants/messages");
+const success = require("../../../shared/responses/success");
 
 async function list(req, res, next) {
   try {
     const categories = await service.findMany();
 
-    return res.status(200).json({
-      success: true,
-      data: categories,
-    });
+    return success(res, 200, MESSAGES.CATEGORY.GET_ALL_SUCCESS, categories);
   } catch (err) {
     next(err);
   }
@@ -19,10 +18,7 @@ async function get(req, res, next) {
       req.params.id
     );
 
-    return res.status(200).json({
-      success: true,
-      data: category,
-    });
+    return success(res, 200, MESSAGES.CATEGORY.GET_SUCCESS, category);
   } catch (err) {
     next(err);
   }
@@ -34,10 +30,7 @@ async function create(req, res, next) {
       req.validated
     );
 
-    return res.status(201).json({
-      success: true,
-      data: category,
-    });
+    return success(res, 201, MESSAGES.CATEGORY.CREATE_SUCCESS, category);
   } catch (err) {
     next(err);
   }
@@ -50,10 +43,7 @@ async function update(req, res, next) {
       req.validated
     );
 
-    return res.status(200).json({
-      success: true,
-      data: category,
-    });
+    return success(res, 200, MESSAGES.CATEGORY.UPDATE_SUCCESS, category);
   } catch (err) {
     next(err);
   }
@@ -65,10 +55,7 @@ async function remove(req, res, next) {
       req.params.id
     );
 
-    return res.status(200).json({
-      success: true,
-      message: "Category deleted successfully",
-    });
+    return success(res, 200, MESSAGES.CATEGORY.DELETE_SUCCESS);
   } catch (err) {
     next(err);
   }

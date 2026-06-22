@@ -53,13 +53,13 @@
  * @swagger
  * /profiles:
  *   get:
- *     summary: Lấy tất cả profile (địa chỉ) của khách hàng đang đăng nhập
+ *     summary: Get all profiles
  *     tags: [Profile]
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Thành công
+ *         description: Profiles retrieved successfully
  *         content:
  *           application/json:
  *             schema:
@@ -68,7 +68,7 @@
  *                 $ref: '#/components/schemas/ProfileResponse'
  *
  *   post:
- *     summary: Tạo profile (địa chỉ) mới
+ *     summary: Create profile
  *     tags: [Profile]
  *     security:
  *       - bearerAuth: []
@@ -80,7 +80,7 @@
  *             $ref: '#/components/schemas/ProfileRequest'
  *     responses:
  *       201:
- *         description: Tạo profile thành công
+ *         description: Profile created successfully
  *         content:
  *           application/json:
  *             schema:
@@ -91,7 +91,7 @@
  * @swagger
  * /profiles/{id}:
  *   get:
- *     summary: Lấy chi tiết một profile
+ *     summary: Get profile by ID
  *     tags: [Profile]
  *     security:
  *       - bearerAuth: []
@@ -103,18 +103,18 @@
  *           type: integer
  *     responses:
  *       200:
- *         description: Thành công
+ *         description: Profile retrieved successfully
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/ProfileResponse'
  *       403:
- *         description: Không có quyền truy cập (không phải profile của bạn)
+ *         description: Forbidden
  *       404:
- *         description: Không tìm thấy profile
+ *         description: Profile not found
  *
  *   put:
- *     summary: Cập nhật profile
+ *     summary: Update profile
  *     tags: [Profile]
  *     security:
  *       - bearerAuth: []
@@ -132,14 +132,14 @@
  *             $ref: '#/components/schemas/ProfileRequest'
  *     responses:
  *       200:
- *         description: Cập nhật thành công
+ *         description: Profile updated successfully
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/ProfileResponse'
  *
  *   delete:
- *     summary: Xóa một profile
+ *     summary: Delete profile
  *     tags: [Profile]
  *     security:
  *       - bearerAuth: []
@@ -151,20 +151,20 @@
  *           type: integer
  *     responses:
  *       200:
- *         description: Xóa thành công
+ *         description: Profile deleted successfully
  *       400:
- *         description: Không thể xóa profile duy nhất
+ *         description: Cannot delete the only profile
  *       403:
- *         description: Không có quyền
+ *         description: Forbidden
  *       404:
- *         description: Không tìm thấy profile
+ *         description: Profile not found
  */
 
 /**
  * @swagger
  * /profiles/{id}/set-default:
  *   patch:
- *     summary: Đặt profile này làm địa chỉ mặc định
+ *     summary: Set default profile
  *     tags: [Profile]
  *     security:
  *       - bearerAuth: []
@@ -176,7 +176,7 @@
  *           type: integer
  *     responses:
  *       200:
- *         description: Đặt làm mặc định thành công
+ *         description: Default profile updated successfully
  *         content:
  *           application/json:
  *             schema:

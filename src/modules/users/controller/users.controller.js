@@ -1,10 +1,12 @@
 const service = require("../service/users.service");
+const MESSAGES = require("../../../shared/constants/messages");
+const success = require("../../../shared/responses/success");
 
 // Lấy danh sách nhân viên
 async function getAll(req, res, next) {
   try {
     const result = await service.getAllUsers(req.validated);
-    res.json(result);
+    success(res, 200, MESSAGES.USER.GET_ALL_SUCCESS, result);
   } catch (err) {
     next(err);
   }
@@ -14,7 +16,7 @@ async function getAll(req, res, next) {
 async function getById(req, res, next) {
   try {
     const result = await service.getUserById(req.params.id);
-    res.json(result);
+    success(res, 200, MESSAGES.USER.GET_SUCCESS, result);
   } catch (err) {
     next(err);
   }
@@ -24,7 +26,7 @@ async function getById(req, res, next) {
 async function create(req, res, next) {
   try {
     const result = await service.createUser(req.validated);
-    res.status(201).json(result);
+    success(res, 201, MESSAGES.USER.CREATE_SUCCESS, result);
   } catch (err) {
     next(err);
   }
@@ -34,7 +36,7 @@ async function create(req, res, next) {
 async function update(req, res, next) {
   try {
     const result = await service.updateUser(req.params.id, req.validated);
-    res.json(result);
+    success(res, 200, MESSAGES.USER.UPDATE_SUCCESS, result);
   } catch (err) {
     next(err);
   }
@@ -44,7 +46,7 @@ async function update(req, res, next) {
 async function resetPassword(req, res, next) {
   try {
     await service.resetPassword(req.params.id, req.validated.newPassword);
-    res.json({ message: "Password reset successfully" });
+    success(res, 200, MESSAGES.USER.RESET_PASSWORD_SUCCESS);
   } catch (err) {
     next(err);
   }
@@ -54,7 +56,7 @@ async function resetPassword(req, res, next) {
 async function remove(req, res, next) {
   try {
     const result = await service.deleteUser(req.params.id);
-    res.json({ message: "User deleted successfully", data: result });
+    success(res, 200, MESSAGES.USER.DELETE_SUCCESS, result);
   } catch (err) {
     next(err);
   }
@@ -64,7 +66,7 @@ async function remove(req, res, next) {
 async function toggleStatus(req, res, next) {
   try {
     const result = await service.toggleUserStatus(req.params.id, req.validated.status);
-    res.json(result);
+    success(res, 200, MESSAGES.USER.CHANGE_STATUS_SUCCESS, result);
   } catch (err) {
     next(err);
   }

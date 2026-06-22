@@ -41,7 +41,7 @@
  * @swagger
  * /orders/{orderId}/payment:
  *   get:
- *     summary: Lấy thông tin thanh toán của một đơn hàng
+ *     summary: Get payment by order
  *     tags: [Payment]
  *     security:
  *       - bearerAuth: []
@@ -53,22 +53,22 @@
  *           type: integer
  *     responses:
  *       200:
- *         description: Thành công
+ *         description: Payment retrieved successfully
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/PaymentResponse'
  *       403:
- *         description: Không có quyền xem thanh toán này (Customer chỉ xem đơn của mình)
+ *         description: Forbidden
  *       404:
- *         description: Không tìm thấy đơn hàng hoặc thanh toán
+ *         description: Order or payment not found
  */
 
 /**
  * @swagger
  * /orders/{orderId}/payment/confirm-cod:
  *   patch:
- *     summary: Xác nhận đã thu tiền COD (dành cho Staff)
+ *     summary: Confirm COD payment
  *     tags: [Payment]
  *     security:
  *       - bearerAuth: []
@@ -80,13 +80,13 @@
  *           type: integer
  *     responses:
  *       200:
- *         description: Xác nhận thanh toán COD thành công
+ *         description: COD payment confirmed successfully
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/PaymentResponse'
  *       400:
- *         description: Đơn hàng chưa giao thành công hoặc đã thanh toán
+ *         description: Order has not been delivered or is already paid
  *       404:
- *         description: Không tìm thấy đơn hàng hoặc thanh toán
+ *         description: Order or payment not found
  */

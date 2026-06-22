@@ -1,4 +1,6 @@
 const service = require("../service/orders.service");
+const MESSAGES = require("../../../shared/constants/messages");
+const success = require("../../../shared/responses/success");
 
 // Lấy danh sách đơn hàng
 async function getAll(req, res, next) {
@@ -9,7 +11,7 @@ async function getAll(req, res, next) {
       : req.validated;
 
     const result = await service.getAllOrders(filter);
-    res.json(result);
+    success(res, 200, MESSAGES.ORDER.GET_ALL_SUCCESS, result);
   } catch (err) {
     next(err);
   }
@@ -25,7 +27,7 @@ async function getById(req, res, next) {
       return res.status(403).json({ error: "Forbidden" });
     }
 
-    res.json(order);
+    success(res, 200, MESSAGES.ORDER.GET_SUCCESS, order);
   } catch (err) {
     next(err);
   }
@@ -35,7 +37,7 @@ async function getById(req, res, next) {
 async function create(req, res, next) {
   try {
     const result = await service.createOrder(req.validated, req.user.id);
-    res.status(201).json(result);
+    success(res, 201, MESSAGES.ORDER.CREATE_SUCCESS, result);
   } catch (err) {
     next(err);
   }
@@ -46,7 +48,7 @@ async function suggestBranches(req, res, next) {
   try {
     const { items, customerLat, customerLng } = req.validated;
     const result = await service.suggestBranches(items, customerLat, customerLng);
-    res.json(result);
+    success(res, 200, MESSAGES.ORDER.SUGGEST_BRANCHES_SUCCESS, result);
   } catch (err) {
     next(err);
   }
@@ -56,7 +58,7 @@ async function suggestBranches(req, res, next) {
 async function confirm(req, res, next) {
   try {
     const result = await service.confirmOrder(req.params.id, req.user.id);
-    res.json(result);
+    success(res, 200, MESSAGES.ORDER.CONFIRM_SUCCESS, result);
   } catch (err) {
     next(err);
   }
@@ -70,7 +72,7 @@ async function updateStatus(req, res, next) {
       req.validated.status,
       req.user.id,
     );
-    res.json(result);
+    success(res, 200, MESSAGES.ORDER.UPDATE_STATUS_SUCCESS, result);
   } catch (err) {
     next(err);
   }
@@ -84,7 +86,7 @@ async function cancel(req, res, next) {
       req.user.id,
       req.user.role,
     );
-    res.json(result);
+    success(res, 200, MESSAGES.ORDER.CANCEL_SUCCESS, result);
   } catch (err) {
     next(err);
   }

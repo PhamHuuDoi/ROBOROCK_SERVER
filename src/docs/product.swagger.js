@@ -112,7 +112,7 @@
  * @swagger
  * /products:
  *   get:
- *     summary: Lấy danh sách sản phẩm (có phân trang, tìm kiếm)
+ *     summary: Get all products
  *     tags: [Product]
  *     parameters:
  *       - in: query
@@ -136,7 +136,7 @@
  *           type: integer
  *     responses:
  *       200:
- *         description: Thành công
+ *         description: Products retrieved successfully
  *         content:
  *           application/json:
  *             schema:
@@ -154,7 +154,7 @@
  *                   type: integer
  *
  *   post:
- *     summary: Tạo sản phẩm mới (hỗ trợ upload ảnh)
+ *     summary: Create product
  *     tags: [Product]
  *     security:
  *       - bearerAuth: []
@@ -193,20 +193,20 @@
  *                   format: binary
  *     responses:
  *       201:
- *         description: Tạo sản phẩm thành công
+ *         description: Product created successfully
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/ProductResponse'
  *       403:
- *         description: Không có quyền
+ *         description: Forbidden
  */
 
 /**
  * @swagger
  * /products/{id}:
  *   get:
- *     summary: Lấy chi tiết một sản phẩm
+ *     summary: Get product by ID
  *     tags: [Product]
  *     parameters:
  *       - in: path
@@ -216,7 +216,7 @@
  *           type: integer
  *     responses:
  *       200:
- *         description: Thành công
+ *         description: Product retrieved successfully
  *         content:
  *           application/json:
  *             schema:
@@ -227,10 +227,10 @@
  *                 data:
  *                   $ref: '#/components/schemas/ProductResponse'
  *       404:
- *         description: Không tìm thấy sản phẩm
+ *         description: Product not found
  *
  *   put:
- *     summary: Cập nhật sản phẩm (hỗ trợ upload ảnh mới)
+ *     summary: Update product
  *     tags: [Product]
  *     security:
  *       - bearerAuth: []
@@ -271,14 +271,14 @@
  *                   format: binary
  *     responses:
  *       200:
- *         description: Cập nhật thành công
+ *         description: Product updated successfully
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/ProductResponse'
  *
  *   delete:
- *     summary: Xóa mềm sản phẩm (Soft Delete)
+ *     summary: Delete product
  *     tags: [Product]
  *     security:
  *       - bearerAuth: []
@@ -290,14 +290,14 @@
  *           type: integer
  *     responses:
  *       204:
- *         description: Xóa mềm thành công
+ *         description: Product deleted successfully
  */
 
 /**
  * @swagger
  * /products/{id}/images/{imageId}:
  *   delete:
- *     summary: Xóa một ảnh phụ của sản phẩm
+ *     summary: Delete product image
  *     tags: [Product]
  *     security:
  *       - bearerAuth: []
@@ -314,7 +314,7 @@
  *           type: integer
  *     responses:
  *       204:
- *         description: Xóa ảnh thành công
+ *         description: Product image deleted successfully
  *       404:
- *         description: Không tìm thấy ảnh
+ *         description: Image not found
  */

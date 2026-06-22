@@ -1,10 +1,12 @@
 const service = require("../service/transfers.service");
+const MESSAGES = require("../../../shared/constants/messages");
+const success = require("../../../shared/responses/success");
 
 // Lấy danh sách yêu cầu chuyển kho
 async function getAll(req, res, next) {
   try {
     const result = await service.getAllTransfers(req.validated);
-    res.json(result);
+    success(res, 200, MESSAGES.TRANSFER.GET_ALL_SUCCESS, result);
   } catch (err) {
     next(err);
   }
@@ -13,7 +15,7 @@ async function getAll(req, res, next) {
 async function getById(req, res, next) {
   try {
     const result = await service.getTransferById(req.params.id);
-    res.json(result);
+    success(res, 200, MESSAGES.TRANSFER.GET_SUCCESS, result);
   } catch (err) {
     next(err);
   }
@@ -26,7 +28,7 @@ async function create(req, res, next) {
       req.user.id,
       req.user.role,
     );
-    res.status(201).json(result);
+    success(res, 201, MESSAGES.TRANSFER.CREATE_SUCCESS, result);
   } catch (err) {
     next(err);
   }
@@ -35,7 +37,7 @@ async function create(req, res, next) {
 async function approve(req, res, next) {
   try {
     const result = await service.approveTransfer(req.params.id, req.user.id);
-    res.json(result);
+    success(res, 200, MESSAGES.TRANSFER.APPROVE_SUCCESS, result);
   } catch (err) {
     next(err);
   }
@@ -45,7 +47,7 @@ async function approve(req, res, next) {
 async function reject(req, res, next) {
   try {
     const result = await service.rejectTransfer(req.params.id, req.user.id);
-    res.json(result);
+    success(res, 200, MESSAGES.TRANSFER.REJECT_SUCCESS, result);
   } catch (err) {
     next(err);
   }
@@ -54,7 +56,7 @@ async function reject(req, res, next) {
 async function complete(req, res, next) {
   try {
     const result = await service.completeTransfer(req.params.id, req.user.id);
-    res.json(result);
+    success(res, 200, MESSAGES.TRANSFER.COMPLETE_SUCCESS, result);
   } catch (err) {
     next(err);
   }
@@ -68,7 +70,7 @@ async function cancel(req, res, next) {
       req.user.id,
       req.user.role,
     );
-    res.json(result);
+    success(res, 200, MESSAGES.TRANSFER.CANCEL_SUCCESS, result);
   } catch (err) {
     next(err);
   }

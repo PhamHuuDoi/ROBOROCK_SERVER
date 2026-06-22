@@ -63,7 +63,7 @@
  * @swagger
  * /inventory:
  *   get:
- *     summary: Lấy danh sách tồn kho toàn bộ (có phân trang)
+ *     summary: Get all inventory
  *     tags: [Inventory]
  *     security:
  *       - bearerAuth: []
@@ -88,7 +88,7 @@
  *           type: integer
  *     responses:
  *       200:
- *         description: Thành công
+ *         description: Inventory retrieved successfully
  *         content:
  *           application/json:
  *             schema:
@@ -115,7 +115,7 @@
  * @swagger
  * /inventory/branch/{branchId}:
  *   get:
- *     summary: Lấy tồn kho theo chi nhánh (tất cả kho thuộc chi nhánh)
+ *     summary: Get inventory by branch
  *     tags: [Inventory]
  *     security:
  *       - bearerAuth: []
@@ -141,7 +141,7 @@
  *           type: integer
  *     responses:
  *       200:
- *         description: Thành công
+ *         description: Branch inventory retrieved successfully
  *         content:
  *           application/json:
  *             schema:
@@ -168,7 +168,7 @@
  * @swagger
  * /inventory/product/{productId}:
  *   get:
- *     summary: Lấy tồn kho của một sản phẩm tại tất cả các kho
+ *     summary: Get inventory by product
  *     tags: [Inventory]
  *     security:
  *       - bearerAuth: []
@@ -180,7 +180,7 @@
  *           type: integer
  *     responses:
  *       200:
- *         description: Thành công
+ *         description: Product inventory retrieved successfully
  *         content:
  *           application/json:
  *             schema:
@@ -198,7 +198,7 @@
  * @swagger
  * /inventory/warehouse/{warehouseId}:
  *   get:
- *     summary: Lấy tồn kho chi tiết của một kho cụ thể
+ *     summary: Get inventory by warehouse
  *     tags: [Inventory]
  *     security:
  *       - bearerAuth: []
@@ -210,7 +210,7 @@
  *           type: integer
  *     responses:
  *       200:
- *         description: Thành công
+ *         description: Warehouse inventory retrieved successfully
  *         content:
  *           application/json:
  *             schema:

@@ -92,7 +92,7 @@
  *             $ref: '#/components/schemas/RegisterRequest'
  *     responses:
  *       201:
- *         description: Register success
+ *         description: User registered successfully
  *       409:
  *         description: Email already registered
  */
@@ -111,7 +111,7 @@
  *             $ref: '#/components/schemas/LoginRequest'
  *     responses:
  *       200:
- *         description: Login success
+ *         description: Login successfully
  *         content:
  *           application/json:
  *             schema:
@@ -132,7 +132,7 @@
  *             $ref: '#/components/schemas/LoginRequest'
  *     responses:
  *       200:
- *         description: Login success
+ *         description: Login successfully
  */
 
 /**
@@ -149,7 +149,7 @@
  *             $ref: '#/components/schemas/LoginRequest'
  *     responses:
  *       200:
- *         description: Login success
+ *         description: Login successfully
  */
 
 /**
@@ -166,7 +166,7 @@
  *             $ref: '#/components/schemas/RefreshRequest'
  *     responses:
  *       200:
- *         description: New access token generated
+ *         description: Token refreshed successfully
  */
 
 /**
@@ -183,7 +183,7 @@
  *             $ref: '#/components/schemas/LogoutRequest'
  *     responses:
  *       200:
- *         description: Logout success
+ *         description: Logged out successfully
  */
 
 /**
@@ -196,7 +196,7 @@
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: All sessions logged out
+ *         description: All sessions logged out successfully
  */
 
 module.exports = {}; 

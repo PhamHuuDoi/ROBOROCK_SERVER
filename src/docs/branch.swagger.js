@@ -86,7 +86,7 @@
  * @swagger
  * /branchs:
  *   get:
- *     summary: Lấy danh sách tất cả chi nhánh
+ *     summary: Get all branches
  *     tags: [Branch]
  *     security:
  *       - bearerAuth: []
@@ -99,7 +99,7 @@
  *         description: Lọc theo trạng thái
  *     responses:
  *       200:
- *         description: Thành công
+ *         description: Branches retrieved successfully
  *         content:
  *           application/json:
  *             schema:
@@ -108,7 +108,7 @@
  *                 $ref: '#/components/schemas/BranchResponse'
  *
  *   post:
- *     summary: Tạo chi nhánh mới
+ *     summary: Create branch
  *     tags: [Branch]
  *     security:
  *       - bearerAuth: []
@@ -120,20 +120,20 @@
  *             $ref: '#/components/schemas/BranchRequest'
  *     responses:
  *       201:
- *         description: Tạo chi nhánh thành công
+ *         description: Branch created successfully
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/BranchResponse'
  *       403:
- *         description: Không có quyền truy cập
+ *         description: Forbidden
  */
 
 /**
  * @swagger
  * /branchs/{id}:
  *   get:
- *     summary: Lấy thông tin chi tiết một chi nhánh
+ *     summary: Get branch by ID
  *     tags: [Branch]
  *     security:
  *       - bearerAuth: []
@@ -145,16 +145,16 @@
  *           type: integer
  *     responses:
  *       200:
- *         description: Thành công
+ *         description: Branch retrieved successfully
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/BranchResponse'
  *       404:
- *         description: Không tìm thấy chi nhánh
+ *         description: Branch not found
  *
  *   put:
- *     summary: Cập nhật thông tin chi nhánh
+ *     summary: Update branch
  *     tags: [Branch]
  *     security:
  *       - bearerAuth: []
@@ -172,14 +172,14 @@
  *             $ref: '#/components/schemas/BranchRequest'
  *     responses:
  *       200:
- *         description: Cập nhật thành công
+ *         description: Branch updated successfully
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/BranchResponse'
  *
  *   delete:
- *     summary: Xóa chi nhánh
+ *     summary: Delete branch
  *     tags: [Branch]
  *     security:
  *       - bearerAuth: []
@@ -191,18 +191,18 @@
  *           type: integer
  *     responses:
  *       204:
- *         description: Xóa thành công
+ *         description: Branch deleted successfully
  *       400:
- *         description: Không thể xóa vì chi nhánh đang có đơn hàng
+ *         description: Cannot delete branch with existing orders
  *       404:
- *         description: Không tìm thấy chi nhánh
+ *         description: Branch not found
  */
 
 /**
  * @swagger
  * /branchs/{id}/staffs:
  *   post:
- *     summary: Thêm nhân viên vào chi nhánh
+ *     summary: Add staff to branch
  *     tags: [Branch]
  *     security:
  *       - bearerAuth: []
@@ -220,12 +220,12 @@
  *             $ref: '#/components/schemas/BranchStaffRequest'
  *     responses:
  *       201:
- *         description: Thêm nhân viên thành công
+ *         description: Staff added to branch successfully
  *       409:
- *         description: Nhân viên đã thuộc chi nhánh này
+ *         description: Staff already assigned to this branch
  *
  *   delete:
- *     summary: Xóa nhân viên khỏi chi nhánh
+ *     summary: Remove staff from branch
  *     tags: [Branch]
  *     security:
  *       - bearerAuth: []
@@ -242,7 +242,7 @@
  *           type: integer
  *     responses:
  *       204:
- *         description: Xóa thành công
+ *         description: Staff removed from branch successfully
  *       404:
- *         description: Không tìm thấy nhân viên trong chi nhánh
+ *         description: Staff not found in this branch
  */

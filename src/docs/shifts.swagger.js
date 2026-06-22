@@ -1,8 +1,8 @@
 /**
  * @swagger
  * tags:
- *   - name: Transfer
- *     description: Quản lý yêu cầu chuyển kho (Transfer Requests)
+ *   - name: Shift
+ *     description: Quản lý ca làm việc (Shift Management)
  */
 
 /* ====================== SCHEMAS ====================== */
@@ -10,107 +10,87 @@
  * @swagger
  * components:
  *   schemas:
- *     TransferItemRequest:
+ *     ShiftOpenRequest:
  *       type: object
  *       required:
- *         - productId
- *         - quantity
+ *         - branchId
+ *         - name
  *       properties:
- *         productId:
- *           type: integer
- *           example: 25
- *         quantity:
- *           type: integer
- *           example: 30
- *
- *     TransferCreateRequest:
- *       type: object
- *       required:
- *         - fromWarehouseId
- *         - toWarehouseId
- *         - items
- *       properties:
- *         fromWarehouseId:
+ *         branchId:
  *           type: integer
  *           example: 1
- *         toWarehouseId:
+ *         name:
+ *           type: string
+ *           example: "Ca sáng 07/06/2026"
+ *
+ *     ShiftAddStaffRequest:
+ *       type: object
+ *       required:
+ *         - staffId
+ *       properties:
+ *         staffId:
  *           type: integer
  *           example: 5
- *         note:
- *           type: string
- *           example: "Chuyển hàng cho chi nhánh Hà Nội"
- *         items:
- *           type: array
- *           items:
- *             $ref: '#/components/schemas/TransferItemRequest'
  *
- *     TransferResponse:
+ *     ShiftResponse:
  *       type: object
  *       properties:
  *         id:
  *           type: integer
- *         fromWarehouseId:
+ *         branchId:
  *           type: integer
- *         toWarehouseId:
- *           type: integer
- *         requestedBy:
- *           type: integer
- *         approvedBy:
- *           type: integer
- *         receivedBy:
- *           type: integer
+ *         name:
+ *           type: string
  *         status:
  *           type: string
- *           enum: [PENDING, APPROVED, REJECTED, COMPLETED, CANCELLED]
- *         note:
+ *           enum: [OPEN, CLOSED]
+ *         startTime:
  *           type: string
+ *           format: date-time
+ *         endTime:
+ *           type: string
+ *           format: date-time
+ *         totalRevenue:
+ *           type: number
+ *         openedBy:
+ *           type: integer
+ *         closedBy:
+ *           type: integer
  *         createdAt:
  *           type: string
  *           format: date-time
- *         receivedAt:
- *           type: string
- *           format: date-time
- *         completedAt:
- *           type: string
- *           format: date-time
- *         fromWarehouse:
+ *         branch:
  *           type: object
  *           properties:
  *             id:
  *               type: integer
  *             name:
  *               type: string
- *         toWarehouse:
- *           type: object
- *           properties:
- *             id:
- *               type: integer
- *             name:
- *               type: string
- *         requester:
+ *         opener:
  *           type: object
  *           properties:
  *             id:
  *               type: integer
  *             fullName:
  *               type: string
- *         items:
+ *         closer:
+ *           type: object
+ *           properties:
+ *             id:
+ *               type: integer
+ *             fullName:
+ *               type: string
+ *         shiftStaffs:
  *           type: array
  *           items:
  *             type: object
  *             properties:
- *               productId:
- *                 type: integer
- *               quantity:
- *                 type: integer
- *               product:
+ *               staff:
  *                 type: object
  *                 properties:
  *                   id:
  *                     type: integer
- *                   name:
- *                     type: string
- *                   sku:
+ *                   fullName:
  *                     type: string
  */
 
@@ -118,10 +98,10 @@
 
 /**
  * @swagger
- * /transfers:
+ * /shifts:
  *   get:
- *     summary: Get all transfer requests
- *     tags: [Transfer]
+ *     summary: Lấy danh sách ca làm việc (có phân trang)
+ *     tags: [Shift]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -136,21 +116,17 @@
  *           type: integer
  *           default: 10
  *       - in: query
+ *         name: branchId
+ *         schema:
+ *           type: integer
+ *       - in: query
  *         name: status
  *         schema:
  *           type: string
- *           enum: [PENDING, APPROVED, REJECTED, COMPLETED, CANCELLED]
- *       - in: query
- *         name: fromWarehouseId
- *         schema:
- *           type: integer
- *       - in: query
- *         name: toWarehouseId
- *         schema:
- *           type: integer
+ *           enum: [OPEN, CLOSED]
  *     responses:
  *       200:
- *         description: Transfer requests retrieved successfully
+ *         description: Thành công
  *         content:
  *           application/json:
  *             schema:
@@ -159,7 +135,7 @@
  *                 items:
  *                   type: array
  *                   items:
- *                     $ref: '#/components/schemas/TransferResponse'
+ *                     $ref: '#/components/schemas/ShiftResponse'
  *                 pagination:
  *                   type: object
  *                   properties:
@@ -173,8 +149,8 @@
  *                       type: integer
  *
  *   post:
- *     summary: Create transfer request
- *     tags: [Transfer]
+ *     summary: Mở ca làm việc mới
+ *     tags: [Shift]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -182,24 +158,24 @@
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/TransferCreateRequest'
+ *             $ref: '#/components/schemas/ShiftOpenRequest'
  *     responses:
  *       201:
- *         description: Transfer request created successfully
+ *         description: Mở ca thành công
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/TransferResponse'
+ *               $ref: '#/components/schemas/ShiftResponse'
  *       400:
- *         description: Insufficient inventory or invalid transfer rule
+ *         description: Chi nhánh đã có ca đang mở
  */
 
 /**
  * @swagger
- * /transfers/{id}:
+ * /shifts/{id}:
  *   get:
- *     summary: Get transfer request by ID
- *     tags: [Transfer]
+ *     summary: Lấy chi tiết một ca làm việc
+ *     tags: [Shift]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -210,21 +186,21 @@
  *           type: integer
  *     responses:
  *       200:
- *         description: Transfer request retrieved successfully
+ *         description: Thành công
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/TransferResponse'
+ *               $ref: '#/components/schemas/ShiftResponse'
  *       404:
- *         description: Transfer request not found
+ *         description: Không tìm thấy ca
  */
 
 /**
  * @swagger
- * /transfers/{id}/approve:
+ * /shifts/{id}/close:
  *   patch:
- *     summary: Approve transfer request
- *     tags: [Transfer]
+ *     summary: Đóng ca làm việc
+ *     tags: [Shift]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -235,19 +211,21 @@
  *           type: integer
  *     responses:
  *       200:
- *         description: Transfer request approved successfully
+ *         description: Đóng ca thành công
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/TransferResponse'
+ *               $ref: '#/components/schemas/ShiftResponse'
+ *       400:
+ *         description: Ca đã đóng hoặc không tồn tại
  */
 
 /**
  * @swagger
- * /transfers/{id}/reject:
- *   patch:
- *     summary: Reject transfer request
- *     tags: [Transfer]
+ * /shifts/{id}/staffs:
+ *   post:
+ *     summary: Thêm nhân viên vào ca
+ *     tags: [Shift]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -256,21 +234,23 @@
  *         required: true
  *         schema:
  *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/ShiftAddStaffRequest'
  *     responses:
- *       200:
- *         description: Transfer request rejected successfully
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/TransferResponse'
- */
-
-/**
- * @swagger
- * /transfers/{id}/complete:
- *   patch:
- *     summary: Complete transfer request
- *     tags: [Transfer]
+ *       201:
+ *         description: Thêm nhân viên thành công
+ *       400:
+ *         description: Ca đã đóng
+ *       409:
+ *         description: Nhân viên đã có trong ca
+ *
+ *   delete:
+ *     summary: Nhân viên rời ca
+ *     tags: [Shift]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -279,34 +259,14 @@
  *         required: true
  *         schema:
  *           type: integer
- *     responses:
- *       200:
- *         description: Transfer request completed successfully
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/TransferResponse'
- */
-
-/**
- * @swagger
- * /transfers/{id}/cancel:
- *   patch:
- *     summary: Cancel transfer request
- *     tags: [Transfer]
- *     security:
- *       - bearerAuth: []
- *     parameters:
  *       - in: path
- *         name: id
+ *         name: staffId
  *         required: true
  *         schema:
  *           type: integer
  *     responses:
  *       200:
- *         description: Transfer request canceled successfully
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/TransferResponse'
+ *         description: Nhân viên đã rời ca thành công
+ *       400:
+ *         description: Ca đã đóng
  */

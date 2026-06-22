@@ -11,6 +11,7 @@ const orders=require('../modules/order');
 const payments=require('../modules/payments');
 const profiles=require('../modules/profiles');
 const users=require('../modules/users');
+const shifts=require('../modules/shifts');
 const router = express.Router();
 
 router.use('/auth', auth);
@@ -25,4 +26,5 @@ router.use('/cart', cart);
 router.use('/orders', orders);
 router.use('/profiles', profiles);
 router.use('/users', users);
+router.use('/shifts', shifts);
 module.exports = router;

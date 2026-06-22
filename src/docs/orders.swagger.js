@@ -122,7 +122,7 @@
  * @swagger
  * /orders/suggest-branches:
  *   post:
- *     summary: Gợi ý chi nhánh có đủ hàng (dùng trước khi tạo đơn)
+ *     summary: Suggest branches for order
  *     tags: [Order]
  *     security:
  *       - bearerAuth: []
@@ -143,14 +143,14 @@
  *                 type: number
  *     responses:
  *       200:
- *         description: Danh sách chi nhánh phù hợp
+ *         description: Suggested branches retrieved successfully
  */
 
 /**
  * @swagger
  * /orders:
  *   get:
- *     summary: Lấy danh sách đơn hàng (có phân trang + filter)
+ *     summary: Get all orders
  *     tags: [Order]
  *     security:
  *       - bearerAuth: []
@@ -176,7 +176,7 @@
  *           type: integer
  *     responses:
  *       200:
- *         description: Thành công
+ *         description: Orders retrieved successfully
  *         content:
  *           application/json:
  *             schema:
@@ -199,7 +199,7 @@
  *                       type: integer
  *
  *   post:
- *     summary: Tạo đơn hàng mới (Customer)
+ *     summary: Create order
  *     tags: [Order]
  *     security:
  *       - bearerAuth: []
@@ -211,7 +211,7 @@
  *             $ref: '#/components/schemas/OrderCreateRequest'
  *     responses:
  *       201:
- *         description: Tạo đơn hàng thành công
+ *         description: Order created successfully
  *         content:
  *           application/json:
  *             schema:
@@ -222,7 +222,7 @@
  * @swagger
  * /orders/{id}:
  *   get:
- *     summary: Lấy chi tiết một đơn hàng
+ *     summary: Get order by ID
  *     tags: [Order]
  *     security:
  *       - bearerAuth: []
@@ -234,18 +234,18 @@
  *           type: integer
  *     responses:
  *       200:
- *         description: Thành công
+ *         description: Order retrieved successfully
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/OrderResponse'
  *       403:
- *         description: Không có quyền xem đơn hàng này
+ *         description: Forbidden
  *       404:
- *         description: Không tìm thấy đơn hàng
+ *         description: Order not found
  *
  *   patch:
- *     summary: Staff cập nhật trạng thái đơn hàng (CONFIRMED → PACKING → SHIPPING → DELIVERED)
+ *     summary: Update order status
  *     tags: [Order]
  *     security:
  *       - bearerAuth: []
@@ -267,14 +267,14 @@
  *                 enum: [PACKING, SHIPPING, DELIVERED]
  *     responses:
  *       200:
- *         description: Cập nhật trạng thái thành công
+ *         description: Order status updated successfully
  */
 
 /**
  * @swagger
  * /orders/{id}/confirm:
  *   patch:
- *     summary: Staff xác nhận đơn hàng (PENDING → CONFIRMED) và trừ tồn kho
+ *     summary: Confirm order
  *     tags: [Order]
  *     security:
  *       - bearerAuth: []
@@ -286,14 +286,14 @@
  *           type: integer
  *     responses:
  *       200:
- *         description: Xác nhận đơn hàng thành công
+ *         description: Order confirmed successfully
  */
 
 /**
  * @swagger
  * /orders/{id}/cancel:
  *   patch:
- *     summary: Hủy đơn hàng (chỉ áp dụng cho đơn PENDING)
+ *     summary: Cancel order
  *     tags: [Order]
  *     security:
  *       - bearerAuth: []
@@ -305,5 +305,5 @@
  *           type: integer
  *     responses:
  *       200:
- *         description: Hủy đơn hàng thành công
+ *         description: Order canceled successfully
  */

@@ -1,4 +1,6 @@
 const service = require("../service/payments.service");
+const MESSAGES = require("../../../shared/constants/messages");
+const success = require("../../../shared/responses/success");
 
 // Lấy thông tin thanh toán của đơn hàng
 async function getByOrder(req, res, next) {
@@ -8,7 +10,7 @@ async function getByOrder(req, res, next) {
       req.user.id,
       req.user.role,
     );
-    res.json(result);
+    success(res, 200, MESSAGES.PAYMENT.GET_SUCCESS, result);
   } catch (err) {
     next(err);
   }
@@ -18,7 +20,7 @@ async function getByOrder(req, res, next) {
 async function confirmCod(req, res, next) {
   try {
     const result = await service.confirmCodPayment(req.params.orderId, req.user.id);
-    res.json(result);
+    success(res, 200, MESSAGES.PAYMENT.CONFIRM_COD_SUCCESS, result);
   } catch (err) {
     next(err);
   }

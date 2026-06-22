@@ -63,11 +63,11 @@
  * @swagger
  * /categories:
  *   get:
- *     summary: Lấy danh sách tất cả danh mục
+ *     summary: Get all categories
  *     tags: [Category]
  *     responses:
  *       200:
- *         description: Thành công
+ *         description: Categories retrieved successfully
  *         content:
  *           application/json:
  *             schema:
@@ -81,7 +81,7 @@
  *                     $ref: '#/components/schemas/CategoryResponse'
  *
  *   post:
- *     summary: Tạo danh mục mới
+ *     summary: Create category
  *     tags: [Category]
  *     security:
  *       - bearerAuth: []
@@ -93,7 +93,7 @@
  *             $ref: '#/components/schemas/CategoryRequest'
  *     responses:
  *       201:
- *         description: Tạo danh mục thành công
+ *         description: Category created successfully
  *         content:
  *           application/json:
  *             schema:
@@ -104,16 +104,16 @@
  *                 data:
  *                   $ref: '#/components/schemas/CategoryResponse'
  *       409:
- *         description: Slug đã tồn tại
+ *         description: Category slug already exists
  *       403:
- *         description: Không có quyền truy cập (chỉ SYSTEM_ADMIN)
+ *         description: Forbidden
  */
 
 /**
  * @swagger
  * /categories/{id}:
  *   get:
- *     summary: Lấy thông tin chi tiết một danh mục
+ *     summary: Get category by ID
  *     tags: [Category]
  *     parameters:
  *       - in: path
@@ -123,7 +123,7 @@
  *           type: integer
  *     responses:
  *       200:
- *         description: Thành công
+ *         description: Category retrieved successfully
  *         content:
  *           application/json:
  *             schema:
@@ -134,10 +134,10 @@
  *                 data:
  *                   $ref: '#/components/schemas/CategoryResponse'
  *       404:
- *         description: Không tìm thấy danh mục
+ *         description: Category not found
  *
  *   put:
- *     summary: Cập nhật danh mục
+ *     summary: Update category
  *     tags: [Category]
  *     security:
  *       - bearerAuth: []
@@ -155,7 +155,7 @@
  *             $ref: '#/components/schemas/CategoryRequest'
  *     responses:
  *       200:
- *         description: Cập nhật thành công
+ *         description: Category updated successfully
  *         content:
  *           application/json:
  *             schema:
@@ -166,12 +166,12 @@
  *                 data:
  *                   $ref: '#/components/schemas/CategoryResponse'
  *       404:
- *         description: Không tìm thấy danh mục
+ *         description: Category not found
  *       409:
- *         description: Slug đã tồn tại
+ *         description: Category slug already exists
  *
  *   delete:
- *     summary: Xóa danh mục
+ *     summary: Delete category
  *     tags: [Category]
  *     security:
  *       - bearerAuth: []
@@ -183,7 +183,7 @@
  *           type: integer
  *     responses:
  *       200:
- *         description: Xóa thành công
+ *         description: Category deleted successfully
  *         content:
  *           application/json:
  *             schema:
@@ -194,5 +194,5 @@
  *                 message:
  *                   type: string
  *       404:
- *         description: Không tìm thấy danh mục
+ *         description: Category not found
  */

@@ -116,7 +116,7 @@
  * @swagger
  * /imports:
  *   get:
- *     summary: Lấy danh sách phiếu nhập kho (có phân trang)
+ *     summary: Get all import receipts
  *     tags: [Import]
  *     security:
  *       - bearerAuth: []
@@ -141,7 +141,7 @@
  *           type: integer
  *     responses:
  *       200:
- *         description: Thành công
+ *         description: Import receipts retrieved successfully
  *         content:
  *           application/json:
  *             schema:
@@ -164,7 +164,7 @@
  *                       type: integer
  *
  *   post:
- *     summary: Tạo phiếu nhập kho mới
+ *     summary: Create import receipt
  *     tags: [Import]
  *     security:
  *       - bearerAuth: []
@@ -176,22 +176,22 @@
  *             $ref: '#/components/schemas/ImportCreateRequest'
  *     responses:
  *       201:
- *         description: Tạo phiếu nhập thành công
+ *         description: Import receipt created successfully
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/ImportResponse'
  *       400:
- *         description: Chỉ được nhập vào kho MAIN
+ *         description: Only MAIN warehouse imports are allowed
  *       404:
- *         description: Kho hoặc nhà cung cấp không tồn tại
+ *         description: Warehouse or supplier not found
  */
 
 /**
  * @swagger
  * /imports/{id}:
  *   get:
- *     summary: Lấy chi tiết một phiếu nhập kho
+ *     summary: Get import receipt by ID
  *     tags: [Import]
  *     security:
  *       - bearerAuth: []
@@ -203,11 +203,11 @@
  *           type: integer
  *     responses:
  *       200:
- *         description: Thành công
+ *         description: Import receipt retrieved successfully
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/ImportResponse'
  *       404:
- *         description: Không tìm thấy phiếu nhập
+ *         description: Import receipt not found
  */

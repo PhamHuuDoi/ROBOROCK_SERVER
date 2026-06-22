@@ -90,28 +90,28 @@
  * @swagger
  * /cart:
  *   get:
- *     summary: Lấy giỏ hàng của khách hàng đang đăng nhập
+ *     summary: Get current customer's cart
  *     tags: [Cart]
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Thành công
+ *         description: Cart retrieved successfully
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/CartResponse'
  *       401:
- *         description: Chưa đăng nhập
+ *         description: Unauthorized
  *
  *   delete:
- *     summary: Xóa toàn bộ giỏ hàng
+ *     summary: Clear cart
  *     tags: [Cart]
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Xóa giỏ hàng thành công
+ *         description: Cart cleared successfully
  *         content:
  *           application/json:
  *             schema:
@@ -122,7 +122,7 @@
  * @swagger
  * /cart/items:
  *   post:
- *     summary: Thêm sản phẩm vào giỏ hàng (hoặc tăng số lượng nếu đã có)
+ *     summary: Add item to cart
  *     tags: [Cart]
  *     security:
  *       - bearerAuth: []
@@ -134,18 +134,18 @@
  *             $ref: '#/components/schemas/CartItemRequest'
  *     responses:
  *       200:
- *         description: Thêm vào giỏ hàng thành công
+ *         description: Item added to cart successfully
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/CartResponse'
  *       400:
- *         description: Sản phẩm không tồn tại hoặc không active
+ *         description: Product does not exist or is not active
  *       404:
- *         description: Sản phẩm không tìm thấy
+ *         description: Product not found
  *
  *   patch:
- *     summary: Cập nhật số lượng sản phẩm trong giỏ hàng
+ *     summary: Update cart item
  *     tags: [Cart]
  *     security:
  *       - bearerAuth: []
@@ -157,20 +157,20 @@
  *             $ref: '#/components/schemas/CartUpdateRequest'
  *     responses:
  *       200:
- *         description: Cập nhật thành công
+ *         description: Cart item updated successfully
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/CartResponse'
  *       404:
- *         description: Sản phẩm không có trong giỏ hàng
+ *         description: Product is not in the cart
  */
 
 /**
  * @swagger
  * /cart/items/{productId}:
  *   delete:
- *     summary: Xóa một sản phẩm khỏi giỏ hàng
+ *     summary: Remove item from cart
  *     tags: [Cart]
  *     security:
  *       - bearerAuth: []
@@ -182,11 +182,11 @@
  *           type: integer
  *     responses:
  *       200:
- *         description: Xóa thành công
+ *         description: Cart item removed successfully
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/CartResponse'
  *       404:
- *         description: Sản phẩm không có trong giỏ hàng
+ *         description: Product is not in the cart
  */

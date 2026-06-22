@@ -83,7 +83,7 @@
  * @swagger
  * /users:
  *   get:
- *     summary: Lấy danh sách nhân viên (có phân trang và filter)
+ *     summary: Get all users
  *     tags: [User]
  *     security:
  *       - bearerAuth: []
@@ -113,7 +113,7 @@
  *           type: string
  *     responses:
  *       200:
- *         description: Thành công
+ *         description: Users retrieved successfully
  *         content:
  *           application/json:
  *             schema:
@@ -136,7 +136,7 @@
  *                       type: integer
  *
  *   post:
- *     summary: Tạo tài khoản nhân viên mới (chỉ System Admin)
+ *     summary: Create user
  *     tags: [User]
  *     security:
  *       - bearerAuth: []
@@ -148,20 +148,20 @@
  *             $ref: '#/components/schemas/UserCreateRequest'
  *     responses:
  *       201:
- *         description: Tạo nhân viên thành công
+ *         description: User created successfully
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/UserResponse'
  *       409:
- *         description: Email đã tồn tại
+ *         description: Email already exists
  */
 
 /**
  * @swagger
  * /users/{id}:
  *   get:
- *     summary: Lấy chi tiết thông tin một nhân viên
+ *     summary: Get user by ID
  *     tags: [User]
  *     security:
  *       - bearerAuth: []
@@ -173,16 +173,16 @@
  *           type: integer
  *     responses:
  *       200:
- *         description: Thành công
+ *         description: User retrieved successfully
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/UserResponse'
  *       404:
- *         description: Không tìm thấy nhân viên
+ *         description: User not found
  *
  *   put:
- *     summary: Cập nhật thông tin nhân viên
+ *     summary: Update user
  *     tags: [User]
  *     security:
  *       - bearerAuth: []
@@ -200,10 +200,10 @@
  *             $ref: '#/components/schemas/UserUpdateRequest'
  *     responses:
  *       200:
- *         description: Cập nhật thành công
+ *         description: User updated successfully
  *
  *   delete:
- *     summary: Xóa mềm nhân viên (Soft Delete)
+ *     summary: Delete user
  *     tags: [User]
  *     security:
  *       - bearerAuth: []
@@ -215,14 +215,14 @@
  *           type: integer
  *     responses:
  *       200:
- *         description: Xóa mềm thành công
+ *         description: User deleted successfully
  */
 
 /**
  * @swagger
  * /users/{id}/reset-password:
  *   patch:
- *     summary: Reset password cho nhân viên
+ *     summary: Reset user password
  *     tags: [User]
  *     security:
  *       - bearerAuth: []
@@ -246,14 +246,14 @@
  *                 example: "12345678"
  *     responses:
  *       200:
- *         description: Reset password thành công
+ *         description: Password reset successfully
  */
 
 /**
  * @swagger
  * /users/{id}/status:
  *   patch:
- *     summary: Kích hoạt / Vô hiệu hóa tài khoản nhân viên
+ *     summary: Change user status
  *     tags: [User]
  *     security:
  *       - bearerAuth: []
@@ -275,5 +275,5 @@
  *                 enum: [ACTIVE, INACTIVE]
  *     responses:
  *       200:
- *         description: Cập nhật trạng thái thành công
+ *         description: User status updated successfully
  */

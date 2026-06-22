@@ -1,4 +1,6 @@
 const service = require("../service/product.service");
+const MESSAGES = require("../../../shared/constants/messages");
+const success = require("../../../shared/responses/success");
 
 async function list(req, res, next) {
   try {
@@ -9,7 +11,7 @@ async function list(req, res, next) {
       search,
       categoryId,
     });
-    res.json(result);
+    success(res, 200, MESSAGES.PRODUCT.GET_ALL_SUCCESS, result);
   } catch (err) {
     next(err);
   }
@@ -22,10 +24,7 @@ async function get(req, res, next) {
         req.params.id
       );
 
-    return res.status(200).json({
-      success: true,
-      data: product,
-    });
+    return success(res, 200, MESSAGES.PRODUCT.GET_SUCCESS, product);
 
   } catch (err) {
     next(err);
@@ -34,7 +33,7 @@ async function get(req, res, next) {
 async function create(req, res, next) {
   try {
     const result = await service.createProduct(req.validated, req.files);
-    res.status(201).json(result);
+    success(res, 201, MESSAGES.PRODUCT.CREATE_SUCCESS, result);
   } catch (err) {
     next(err);
   }
@@ -43,7 +42,7 @@ async function create(req, res, next) {
 async function update(req, res, next) {
   try {
     const result = await service.updateProduct(req.params.id, req.validated, req.files);
-    res.json(result);
+    success(res, 200, MESSAGES.PRODUCT.UPDATE_SUCCESS, result);
   } catch (err) {
     next(err);
   }
@@ -52,7 +51,7 @@ async function update(req, res, next) {
 async function remove(req, res, next) {
   try {
     await service.deleteProduct(req.params.id);
-    res.status(204).send();
+    success(res, 204, MESSAGES.PRODUCT.DELETE_SUCCESS);
   } catch (err) {
     next(err);
   }
@@ -62,7 +61,7 @@ async function remove(req, res, next) {
 async function removeImage(req, res, next) {
   try {
     await service.deleteProductImage(Number(req.params.imageId));
-    res.status(204).send();
+    success(res, 204, MESSAGES.PRODUCT.DELETE_IMAGE_SUCCESS);
   } catch (err) {
     next(err);
   }

@@ -58,7 +58,7 @@
  * @swagger
  * /warehouses:
  *   get:
- *     summary: Lấy danh sách tất cả kho hàng
+ *     summary: Get all warehouses
  *     tags: [Warehouse]
  *     security:
  *       - bearerAuth: []
@@ -70,7 +70,7 @@
  *         description: Lọc theo chi nhánh
  *     responses:
  *       200:
- *         description: Thành công
+ *         description: Warehouses retrieved successfully
  *         content:
  *           application/json:
  *             schema:
@@ -79,7 +79,7 @@
  *                 $ref: '#/components/schemas/WarehouseResponse'
  *
  *   post:
- *     summary: Tạo kho hàng mới
+ *     summary: Create warehouse
  *     tags: [Warehouse]
  *     security:
  *       - bearerAuth: []
@@ -91,20 +91,20 @@
  *             $ref: '#/components/schemas/WarehouseRequest'
  *     responses:
  *       201:
- *         description: Tạo kho thành công
+ *         description: Warehouse created successfully
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/WarehouseResponse'
  *       403:
- *         description: Không có quyền truy cập
+ *         description: Forbidden
  */
 
 /**
  * @swagger
  * /warehouses/{id}:
  *   get:
- *     summary: Lấy chi tiết một kho hàng
+ *     summary: Get warehouse by ID
  *     tags: [Warehouse]
  *     security:
  *       - bearerAuth: []
@@ -116,16 +116,16 @@
  *           type: integer
  *     responses:
  *       200:
- *         description: Thành công
+ *         description: Warehouse retrieved successfully
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/WarehouseResponse'
  *       404:
- *         description: Không tìm thấy kho
+ *         description: Warehouse not found
  *
  *   put:
- *     summary: Cập nhật thông tin kho hàng
+ *     summary: Update warehouse
  *     tags: [Warehouse]
  *     security:
  *       - bearerAuth: []
@@ -143,16 +143,16 @@
  *             $ref: '#/components/schemas/WarehouseRequest'
  *     responses:
  *       200:
- *         description: Cập nhật thành công
+ *         description: Warehouse updated successfully
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/WarehouseResponse'
  *       404:
- *         description: Không tìm thấy kho
+ *         description: Warehouse not found
  *
  *   delete:
- *     summary: Xóa kho hàng
+ *     summary: Delete warehouse
  *     tags: [Warehouse]
  *     security:
  *       - bearerAuth: []
@@ -164,7 +164,7 @@
  *           type: integer
  *     responses:
  *       200:
- *         description: Xóa thành công
+ *         description: Warehouse deleted successfully
  *         content:
  *           application/json:
  *             schema:
@@ -175,7 +175,7 @@
  *                 data:
  *                   type: object
  *       400:
- *         description: Không thể xóa kho đang có tồn kho
+ *         description: Cannot delete warehouse with existing inventory
  *       404:
- *         description: Không tìm thấy kho
+ *         description: Warehouse not found
  */

@@ -1,11 +1,13 @@
 const service = require("../service/inventory.service");
+const MESSAGES = require("../../../shared/constants/messages");
+const success = require("../../../shared/responses/success");
 
 // GET /inventory
 async function getAll(req, res, next) {
   try {
     console.log("Validated query:", req.validated);
     const result = await service.getAllInventory(req.validated);
-    res.json(result);
+    success(res, 200, MESSAGES.INVENTORY.GET_ALL_SUCCESS, result);
   } catch (err) {
     next(err);
   }
@@ -18,7 +20,7 @@ async function getByBranch(req, res, next) {
       branchId: req.params.branchId,
       ...req.validated,
     });
-    res.json(result);
+    success(res, 200, MESSAGES.INVENTORY.GET_BY_BRANCH_SUCCESS, result);
   } catch (err) {
     next(err);
   }
@@ -28,7 +30,7 @@ async function getByBranch(req, res, next) {
 async function getByProduct(req, res, next) {
   try {
     const result = await service.getProductInventory(req.params.productId);
-    res.json(result);
+    success(res, 200, MESSAGES.INVENTORY.GET_BY_PRODUCT_SUCCESS, result);
   } catch (err) {
     next(err);
   }
@@ -38,7 +40,7 @@ async function getByProduct(req, res, next) {
 async function getByWarehouse(req, res, next) {
   try {
     const result = await service.getWarehouseInventory(req.params.warehouseId);
-    res.json(result);
+    success(res, 200, MESSAGES.INVENTORY.GET_BY_WAREHOUSE_SUCCESS, result);
   } catch (err) {
     next(err);
   }

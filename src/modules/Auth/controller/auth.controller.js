@@ -1,10 +1,12 @@
 const service = require("../service/auth.service");
+const MESSAGES = require("../../../shared/constants/messages");
+const success = require("../../../shared/responses/success");
 
 
 async function register(req, res, next) {
   try {
     const user = await service.register(req.validated);
-    return res.status(201).json(user);
+    return success(res, 201, MESSAGES.AUTH.REGISTER_SUCCESS, user);
   } catch (err) {
     next(err);
   }
@@ -14,7 +16,7 @@ async function register(req, res, next) {
 async function loginCustomer(req, res, next) {
   try {
     const result = await service.loginAs("customer", req.validated);
-    return res.json(result);
+    return success(res, 200, MESSAGES.AUTH.LOGIN_SUCCESS, result);
   } catch (err) {
     next(err);
   }
@@ -23,7 +25,7 @@ async function loginCustomer(req, res, next) {
 async function loginStaff(req, res, next) {
   try {
     const result = await service.loginAs("staff", req.validated);
-    return res.json(result);
+    return success(res, 200, MESSAGES.AUTH.LOGIN_SUCCESS, result);
   } catch (err) {
     next(err);
   }
@@ -32,7 +34,7 @@ async function loginStaff(req, res, next) {
 async function loginAdmin(req, res, next) {
   try {
     const result = await service.loginAs("admin", req.validated);
-    return res.json(result);
+    return success(res, 200, MESSAGES.AUTH.LOGIN_SUCCESS, result);
   } catch (err) {
     next(err);
   }
@@ -42,7 +44,7 @@ async function loginAdmin(req, res, next) {
 async function refresh(req, res, next) {
   try {
     const result = await service.refreshAccessToken(req.validated.refreshToken);
-    return res.json(result);
+    return success(res, 200, MESSAGES.AUTH.REFRESH_SUCCESS, result);
   } catch (err) {
     next(err);
   }
@@ -51,7 +53,7 @@ async function refresh(req, res, next) {
 async function logout(req, res, next) {
   try {
     await service.logout(req.validated.refreshToken);
-    return res.json({ message: "Logged out successfully" });
+    return success(res, 200, MESSAGES.AUTH.LOGOUT_SUCCESS);
   } catch (err) {
     next(err);
   }
@@ -61,7 +63,7 @@ async function logoutAll(req, res, next) {
   try {
     // req.user.id được set bởi authMiddleware
     await service.logoutAll(req.user.id);
-    return res.json({ message: "All sessions logged out" });
+    return success(res, 200, MESSAGES.AUTH.LOGOUT_ALL_SUCCESS);
   } catch (err) {
     next(err);
   }
