@@ -5,18 +5,19 @@ const { validate }       = require("../../../middlewares/validation.middleware")
 const validation         = require("../validation/cart.validation");
 const { authMiddleware } = require("../../../middlewares/auth.middleware");
 const { requireRole }    = require("../../../middlewares/role.middleware");
+const { ROLES }          = require("../../../shared/constants/roles");
 
 // Lấy giỏ hàng
 router.get("/",
   authMiddleware,
-  requireRole("CUSTOMER"),
+  requireRole(ROLES.CUSTOMER),
   controller.getCart
 );
 
 // Thêm sản phẩm vào giỏ hàng
 router.post("/items",
   authMiddleware,
-  requireRole("CUSTOMER"),
+  requireRole(ROLES.CUSTOMER),
   validate(validation.addToCartSchema),
   controller.addToCart
 );
@@ -24,7 +25,7 @@ router.post("/items",
 // Cập nhật số lượng sản phẩm trong giỏ hàng
 router.patch("/items",
   authMiddleware,
-  requireRole("CUSTOMER"),
+  requireRole(ROLES.CUSTOMER),
   validate(validation.updateCartItemSchema),
   controller.updateCartItem
 );
@@ -32,14 +33,14 @@ router.patch("/items",
 // Xóa 1 sản phẩm khỏi giỏ hàng
 router.delete("/items/:productId",
   authMiddleware,
-  requireRole("CUSTOMER"),
+  requireRole(ROLES.CUSTOMER),
   controller.removeFromCart
 );
 
 // Xóa toàn bộ giỏ hàng
 router.delete("/",
   authMiddleware,
-  requireRole("CUSTOMER"),
+  requireRole(ROLES.CUSTOMER),
   controller.clearCart
 );
 

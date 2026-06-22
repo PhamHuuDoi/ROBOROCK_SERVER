@@ -6,38 +6,41 @@ const validation   = require("../validation/warehouse.validation");
 const { authMiddleware }  = require("../../../middlewares/auth.middleware");
 const { requireRole }     = require("../../../middlewares/role.middleware");
 
-const allowedRoles = ["SYSTEM_ADMIN", "WAREHOUSE_MANAGER", "STORE_MANAGER"];
-
+const {
+  ROLES,
+  TRANSFER_ACCESS_ROLE_VALUES,
+  TRANSFER_APPROVAL_ROLE_VALUES,
+} = require("../../../shared/constants/roles");
 router.get("/",
   authMiddleware,
-  requireRole(...allowedRoles),
+  requireRole(...TRANSFER_ACCESS_ROLE_VALUES),
   validate(validation.queryWarehouseSchema),  // validate query params
   controller.getAll
 );
 
 router.get("/:id",
   authMiddleware,
-  requireRole(...allowedRoles),
+  requireRole(...TRANSFER_ACCESS_ROLE_VALUES),
   controller.getById
 );
 
 router.post("/",
   authMiddleware,
-  requireRole("SYSTEM_ADMIN", "WAREHOUSE_MANAGER"),
+  requireRole(...TRANSFER_APPROVAL_ROLE_VALUES),
   validate(validation.createWarehouseSchema),
   controller.create
 );
 
 router.put("/:id",
   authMiddleware,
-  requireRole("SYSTEM_ADMIN", "WAREHOUSE_MANAGER"),
+  requireRole(...TRANSFER_APPROVAL_ROLE_VALUES),
   validate(validation.updateWarehouseSchema),
   controller.update
 );
 
 router.delete("/:id",
   authMiddleware,
-  requireRole("SYSTEM_ADMIN"),
+  requireRole(ROLES.SYSTEM_ADMIN),
   controller.remove
 );
 

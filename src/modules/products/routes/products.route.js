@@ -5,18 +5,25 @@ const validation = require("../validation/product.validation");
 const { authMiddleware } = require("../../../middlewares/auth.middleware");
 const { requireRole } = require("../../../middlewares/role.middleware");
 const { upload } = require("../../../middlewares/upload.middleware");
+const {
+  ROLES,
+  STORE_MANAGEMENT_ROLE_VALUES,
+} = require("../../../shared/constants/roles");
+
 const uploadFields = upload.fields([
   { name: "thumbnail", maxCount: 1 },
   { name: "images", maxCount: 10 },
 ]);
+
 const router = express.Router();
 
 router.get("/", controller.list);
 router.get("/:id", controller.get);
+
 router.post(
   "/",
   authMiddleware,
-  requireRole("SYSTEM_ADMIN", "STORE_MANAGER"),
+  requireRole(...STORE_MANAGEMENT_ROLE_VALUES),
   uploadFields,
   validate(validation.createProductSchema),
   controller.create,
@@ -25,7 +32,7 @@ router.post(
 router.put(
   "/:id",
   authMiddleware,
-  requireRole("SYSTEM_ADMIN", "STORE_MANAGER"),
+  requireRole(...STORE_MANAGEMENT_ROLE_VALUES),
   uploadFields,
   validate(validation.updateProductSchema),
   controller.update,
@@ -34,7 +41,7 @@ router.put(
 router.delete(
   "/:id",
   authMiddleware,
-  requireRole("SYSTEM_ADMIN"),
+  requireRole(ROLES.SYSTEM_ADMIN),
   controller.remove,
 );
 
@@ -42,7 +49,7 @@ router.delete(
 router.delete(
   "/:id/images/:imageId",
   authMiddleware,
-  requireRole("SYSTEM_ADMIN", "STORE_MANAGER"),
+  requireRole(...STORE_MANAGEMENT_ROLE_VALUES),
   controller.removeImage,
 );
 

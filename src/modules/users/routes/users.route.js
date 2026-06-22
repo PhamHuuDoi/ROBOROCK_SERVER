@@ -5,11 +5,15 @@ const { validate }       = require("../../../middlewares/validation.middleware")
 const validation         = require("../validation/users.validation");
 const { authMiddleware } = require("../../../middlewares/auth.middleware");
 const { requireRole }    = require("../../../middlewares/role.middleware");
+const {
+  ROLES,
+  STORE_MANAGEMENT_ROLE_VALUES,
+} = require("../../../shared/constants/roles");
 
 // Lấy danh sách nhân viên
 router.get("/",
   authMiddleware,
-  requireRole("SYSTEM_ADMIN", "STORE_MANAGER"),
+  requireRole(...STORE_MANAGEMENT_ROLE_VALUES),
   validate(validation.queryUserSchema, "query"),
   controller.getAll
 );
@@ -17,14 +21,14 @@ router.get("/",
 // Lấy chi tiết 1 nhân viên
 router.get("/:id",
   authMiddleware,
-  requireRole("SYSTEM_ADMIN", "STORE_MANAGER"),
+  requireRole(...STORE_MANAGEMENT_ROLE_VALUES),
   controller.getById
 );
 
 // Tạo tài khoản nhân viên mới
 router.post("/",
   authMiddleware,
-  requireRole("SYSTEM_ADMIN"),
+  requireRole(ROLES.SYSTEM_ADMIN),
   validate(validation.createUserSchema),
   controller.create
 );
@@ -32,7 +36,7 @@ router.post("/",
 // Cập nhật thông tin nhân viên
 router.put("/:id",
   authMiddleware,
-  requireRole("SYSTEM_ADMIN"),
+  requireRole(ROLES.SYSTEM_ADMIN),
   validate(validation.updateUserSchema),
   controller.update
 );
@@ -40,7 +44,7 @@ router.put("/:id",
 // Reset password nhân viên
 router.patch("/:id/reset-password",
   authMiddleware,
-  requireRole("SYSTEM_ADMIN"),
+  requireRole(ROLES.SYSTEM_ADMIN),
   validate(validation.resetPasswordSchema),
   controller.resetPassword
 );
@@ -48,7 +52,7 @@ router.patch("/:id/reset-password",
 // Kích hoạt / vô hiệu hoá tài khoản
 router.patch("/:id/status",
   authMiddleware,
-  requireRole("SYSTEM_ADMIN", "STORE_MANAGER"),
+  requireRole(...STORE_MANAGEMENT_ROLE_VALUES),
   validate(validation.toggleStatusSchema),
   controller.toggleStatus
 );
@@ -56,7 +60,7 @@ router.patch("/:id/status",
 // Soft delete nhân viên
 router.delete("/:id",
   authMiddleware,
-  requireRole("SYSTEM_ADMIN"),
+  requireRole(ROLES.SYSTEM_ADMIN),
   controller.remove
 );
 
