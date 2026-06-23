@@ -39,6 +39,13 @@ async function findById(id) {
     include: { category: true, images: true },
   });
 }
+//async function findById(id) {
+//   return prisma.product.findUnique({
+//     where: { id: Number(id) },
+//     include: { images: { orderBy: { sortOrder: "asc" } } },
+//   });
+// }
+
 async function create(data) {
   return prisma.product.create({ data });
 }
@@ -70,13 +77,7 @@ async function findExpiredSoftDeleted(beforeDate) {
     },
   });
 }
-async function findById(id) {
-  return prisma.product.findUnique({
-    where: { id: Number(id) },
-    include: { images: { orderBy: { sortOrder: "asc" } } },
-  });
-}
-
+// 
 // ── ProductImage ──────────────────────────────────────
 async function addImages(productId, imageUrls) {
   // imageUrls = ["url1", "url2", ...]
