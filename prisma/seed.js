@@ -1,7 +1,57 @@
 const { PrismaClient } = require("@prisma/client");
 const bcrypt = require("bcryptjs");
+const PRODUCTS_JSON = require("./products.json");
 
 const prisma = new PrismaClient();
+
+const skuBaseCounters = {};
+
+function getCategorySlug(tags = []) {
+  const categoryMapping = {
+    "robot hút bụi": "robot-hut-bui",
+    "q series": "robot-hut-bui",
+    "qrevo series": "robot-hut-bui",
+    "qrevo curv series": "robot-hut-bui",
+    "saros series": "robot-hut-bui",
+    "máy hút bụi": "may-hut-bui",
+    "f25 series": "may-hut-bui",
+    "h series": "may-hut-bui",
+    "phụ kiện": "phu-kien",
+    "dung dịch": "dung-dich",
+  };
+
+  const normalizedTags = (tags || []).map((tag) => String(tag || "").trim().toLowerCase());
+  for (const tag of normalizedTags) {
+    if (categoryMapping[tag]) {
+      return categoryMapping[tag];
+    }
+  }
+
+  return "robot-hut-bui";
+}
+
+function slugToSku(product) {
+  if (product.shopify_id) {
+    return `RR-${product.shopify_id}`;
+  }
+
+  return (
+    "RR-" +
+    String(product.slug || "")
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+  ).toUpperCase();
+}
+
+function generateUniqueSku(product) {
+  const baseSku = slugToSku(product);
+  const count = skuBaseCounters[baseSku] || 0;
+  const sku = count === 0 ? baseSku : `${baseSku}-${count + 1}`.slice(0, 50).replace(/-+$/g, "");
+  skuBaseCounters[baseSku] = count + 1;
+  return sku;
+}
 
 async function main() {
   console.log("🌱 Seeding...");
@@ -112,69 +162,54 @@ async function main() {
   categories.forEach((c) => (categoryMap[c.slug] = c.id));
 
   // ── Products ───────────────────────────────────────────
-  await prisma.product.createMany({
-    skipDuplicates: true,
-    data: [
-      {
-        categoryId:     categoryMap["robot-hut-bui"],
-        name:           "Roborock S8 Pro Ultra",
-        slug:           "roborock-s8-pro-ultra",
-        sku:            "RR-S8-PRO-001",
-        description:    "Robot hút bụi lau nhà cao cấp",
-        priceOnline:    20990000,
-        pricePos:       20500000,
-        weight:         4.5,
-        warrantyMonths: 12,
-        status:         "ACTIVE",
-      },
-      {
-        categoryId:     categoryMap["robot-hut-bui"],
-        name:           "Roborock Q5 Pro",
-        slug:           "roborock-q5-pro",
-        sku:            "RR-Q5-PRO-001",
-        description:    "Robot hút bụi tầm trung",
-        priceOnline:    8990000,
-        pricePos:       8500000,
-        weight:         3.2,
-        warrantyMonths: 12,
-        status:         "ACTIVE",
-      },
-      {
-        categoryId:     categoryMap["robot-hut-bui"],
-        name:           "Roborock E5 Mop",
-        slug:           "roborock-e5-mop",
-        sku:            "RR-E5-MOP-001",
-        description:    "Robot hút bụi giá tốt",
-        priceOnline:    4990000,
-        pricePos:       4700000,
-        weight:         2.8,
-        warrantyMonths: 12,
-        status:         "ACTIVE",
-      },
-      {
-        categoryId:     categoryMap["phu-kien"],
-        name:           "Túi Đựng Rác Roborock",
-        slug:           "tui-dung-rac-roborock",
-        sku:            "RR-ACC-BAG-001",
-        description:    "Túi đựng rác chính hãng",
-        priceOnline:    299000,
-        pricePos:       280000,
+  const slugSkuMap = {};
+  for (const product of PRODUCTS_JSON) {
+    if (!product.slug) {
+      continue;
+    }
+
+    if (!slugSkuMap[product.slug]) {
+      slugSkuMap[product.slug] = generateUniqueSku(product);
+    }
+  }
+
+  for (const product of PRODUCTS_JSON) {
+    if (!product.slug) {
+      continue;
+    }
+
+    const existingProduct = await prisma.product.findUnique({ where: { slug: product.slug } });
+    if (existingProduct) {
+      continue;
+    }
+
+    const categorySlug = getCategorySlug(product.tags);
+    const categoryId = categoryMap[categorySlug] || categoryMap["robot-hut-bui"];
+    const sku = slugSkuMap[product.slug];
+
+    const images = Array.isArray(product.images)
+      ? product.images.map((imageUrl, index) => ({ imageUrl, sortOrder: index }))
+      : [];
+
+    await prisma.product.create({
+      data: {
+        categoryId,
+        name:           product.title || "Untitled Product",
+        slug:           product.slug,
+        sku,
+        description:    product.description || null,
+        thumbnail:      product.thumbnail || null,
+        priceOnline:    product.price ?? 0,
+        pricePos:       product.price ?? 0,
+        weight:         null,
         warrantyMonths: null,
-        status:         "ACTIVE",
+        status:         product.available === false ? "INACTIVE" : "ACTIVE",
+        images: {
+          create: images,
+        },
       },
-      {
-        categoryId:     categoryMap["dung-dich"],
-        name:           "Dung Dịch Lau Sàn Roborock",
-        slug:           "dung-dich-lau-san-roborock",
-        sku:            "RR-CLN-001",
-        description:    "Dung dịch vệ sinh sàn nhà",
-        priceOnline:    199000,
-        pricePos:       180000,
-        warrantyMonths: null,
-        status:         "ACTIVE",
-      },
-    ],
-  });
+    });
+  }
 
   const products = await prisma.product.findMany();
   const productMap = {};
@@ -208,6 +243,21 @@ async function main() {
   suppliers.forEach((s) => (supplierMap[s.name] = s.id));
 
   // ── Import Receipts (nhập kho tổng) ────────────────────
+  const importItems = PRODUCTS_JSON.map((product) => {
+    const sku = slugSkuMap[product.slug];
+    const productId = productMap[sku];
+    if (!productId) {
+      return null;
+    }
+
+    const price = Number(product.price || 0);
+    return {
+      productId,
+      quantity: price >= 10000000 ? 30 : 100,
+      importPrice: Number((price * 0.75).toFixed(2)),
+    };
+  }).filter(Boolean);
+
   const importReceipt = await prisma.importReceipt.create({
     data: {
       warehouseId: warehouseMap["Kho Tổng HCM"],
@@ -215,25 +265,14 @@ async function main() {
       createdBy:   userMap["warehouse@roborock.com"],
       note:        "Nhập hàng đợt 1",
       items: {
-        create: [
-          { productId: productMap["RR-S8-PRO-001"], quantity: 50,  importPrice: 18000000 },
-          { productId: productMap["RR-Q5-PRO-001"], quantity: 100, importPrice: 7000000  },
-          { productId: productMap["RR-E5-MOP-001"], quantity: 150, importPrice: 3800000  },
-          { productId: productMap["RR-ACC-BAG-001"],quantity: 500, importPrice: 150000   },
-          { productId: productMap["RR-CLN-001"],    quantity: 300, importPrice: 100000   },
-        ],
+        create: importItems.map((item) => ({
+          productId:   item.productId,
+          quantity:    item.quantity,
+          importPrice: item.importPrice,
+        })),
       },
     },
   });
-
-  // Cập nhật inventory sau nhập kho
-  const importItems = [
-    { productId: productMap["RR-S8-PRO-001"], quantity: 50  },
-    { productId: productMap["RR-Q5-PRO-001"], quantity: 100 },
-    { productId: productMap["RR-E5-MOP-001"], quantity: 150 },
-    { productId: productMap["RR-ACC-BAG-001"],quantity: 500 },
-    { productId: productMap["RR-CLN-001"],    quantity: 300 },
-  ];
 
   for (const item of importItems) {
     await prisma.inventory.upsert({
@@ -264,12 +303,7 @@ async function main() {
   }
 
   // ── Transfer (chuyển kho tổng → chi nhánh Q1) ─────────
-  const transferItems = [
-    { productId: productMap["RR-S8-PRO-001"], quantity: 10 },
-    { productId: productMap["RR-Q5-PRO-001"], quantity: 20 },
-    { productId: productMap["RR-E5-MOP-001"], quantity: 30 },
-    { productId: productMap["RR-ACC-BAG-001"],quantity: 50 },
-  ];
+  const transferItems = importItems.slice(0, 20);
 
   const transfer = await prisma.transferRequest.create({
     data: {
@@ -282,17 +316,15 @@ async function main() {
       completedAt:     new Date(),
       note:            "Chuyển hàng cho chi nhánh Q1",
       items: {
-        create: transferItems.map((i) => ({
-          productId: i.productId,
-          quantity:  i.quantity,
+        create: transferItems.map((item) => ({
+          productId: item.productId,
+          quantity:  item.quantity,
         })),
       },
     },
   });
 
-  // Cập nhật inventory sau chuyển kho
   for (const item of transferItems) {
-    // Trừ kho tổng
     await prisma.inventory.update({
       where: {
         uq_inventories_wh_prod: {
@@ -303,7 +335,6 @@ async function main() {
       data: { availableQuantity: { decrement: item.quantity } },
     });
 
-    // Cộng kho chi nhánh Q1
     await prisma.inventory.upsert({
       where: {
         uq_inventories_wh_prod: {
@@ -319,7 +350,6 @@ async function main() {
       },
     });
 
-    // Transactions
     await prisma.inventoryTransaction.createMany({
       data: [
         {
